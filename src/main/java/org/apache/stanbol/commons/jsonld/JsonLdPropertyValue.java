@@ -16,13 +16,22 @@
 */
 package org.apache.stanbol.commons.jsonld;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class JsonLdPropertyValue {
 
     private Object value;
     private String type;
     private String language;
     
-    public JsonLdPropertyValue() {
+    private Map<String,String> values = new HashMap<String,String>();
+    private List<String> types = new ArrayList<String>();
+    private Map<String,JsonLdProperty> propertyMap = new HashMap<String,JsonLdProperty>();
+    
+	public JsonLdPropertyValue() {
         
     }
     
@@ -63,6 +72,47 @@ public class JsonLdPropertyValue {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+	public Map<String,String> getValues() {
+		return values;
+	}
+
+	public void setValues(Map<String,String> values) {
+		this.values = values;
+	}
+
+    public void addType(String type) {
+        types.add(type);
+    }
+
+    public void addAllTypes(List<String> types) {
+        this.types.addAll(types);
+    }
+    
+    public List<String> getTypes() {
+        return types;
+    }
+	
+    public void putProperty(JsonLdProperty property) {
+        this.propertyMap.put(property.getName(), property);
+    }
+
+    public JsonLdProperty getPropertyValueIgnoreCase(String property) {
+        for (String p : this.propertyMap.keySet()) {
+            if (p.equalsIgnoreCase(property)) {
+                return this.propertyMap.get(p);
+            }
+        }
+        return null;
+    }
+    
+    public JsonLdProperty getProperty(String property) {
+        return this.propertyMap.get(property);
+    }
+        
+    public Map<String,JsonLdProperty> getPropertyMap() {
+        return this.propertyMap;
     }
 
 }

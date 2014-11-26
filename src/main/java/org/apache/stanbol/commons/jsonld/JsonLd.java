@@ -19,6 +19,7 @@ package org.apache.stanbol.commons.jsonld;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -339,7 +340,7 @@ public class JsonLd extends JsonLdCommon {
         // a datatype and a language.
         Object value = jldProperty.getValues().get(0);
         Map<String,Object> valueObject = new TreeMap<String,Object>();
-        putProperty(valueObject, resource.getCoerceMap(), property, value);
+        putProperty(valueObject, resource, property, value);
         
         if (valueObject.containsKey(TYPE)) {
             putTypedValue(jsonObject, resource, property, valueObject);
@@ -412,7 +413,7 @@ public class JsonLd extends JsonLdCommon {
         
         for (JsonLdPropertyValue value : jldProperty.getValues()) {
             Map<String,Object> valueObject = new TreeMap<String,Object>();
-            putProperty(valueObject, resource.getCoerceMap(), property, value);
+            putProperty(valueObject, resource, property, value);
             
             if (valueObject.containsKey(TYPE)) {
                 if (this.useTypeCoercion) {
@@ -465,10 +466,12 @@ public class JsonLd extends JsonLdCommon {
         }
     }
 
-    private void putProperty(Map<String,Object> jsonObject,
-                               Map<String,String> coercionMap,
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	private void putProperty(Map<String,Object> jsonObject,
+							   JsonLdResource resource, 
                                String property,
                                Object value) throws ShorteningException {
+    	Map<String,String> coercionMap = resource.getCoerceMap();
         if (value instanceof JsonLdIRI) {
             JsonLdIRI iriValue = (JsonLdIRI) value;
             Map<String,Object> iriObject = new TreeMap<String,Object>();
@@ -476,7 +479,9 @@ public class JsonLd extends JsonLdCommon {
             jsonObject.put(shortenURI(property), iriObject);
         } else if (value instanceof JsonLdPropertyValue) {
             JsonLdPropertyValue jldPropertyValue = (JsonLdPropertyValue)value;
-            jsonObject.put(VALUE, jldPropertyValue.getLiteralValue());
+            if (jldPropertyValue.getValue() != null) {
+            	jsonObject.put(VALUE, jldPropertyValue.getLiteralValue());
+            }
             String type = coercionMap.get(property);
             if (type != null) {
                 jldPropertyValue.setType(type);
@@ -484,8 +489,46 @@ public class JsonLd extends JsonLdCommon {
             if (jldPropertyValue.getType() != null) {
                 jsonObject.put(TYPE, shortenURIWithCuries(jldPropertyValue.getType()));
             }
+            if (jldPropertyValue.getTypes() != null && jldPropertyValue.getTypes().size() > 0) {
+            	Iterator<String> itr = jldPropertyValue.getTypes().iterator();
+            	String types = "[";
+            	while (itr.hasNext()) {
+            		types = types + itr.next() + ", ";
+            	}
+                jsonObject.put(TYPE, types.substring(0, types.length() - 2) + "]");
+            }
             if (jldPropertyValue.getLanguage() != null) {
                 jsonObject.put(LANGUAGE, jldPropertyValue.getLanguage());
+            }
+            if (jldPropertyValue.getValues() != null) {
+//				System.out.println(" values size: " + jldPropertyValue.getValues().size());
+                Iterator it = jldPropertyValue.getValues().entrySet().iterator();
+                while (it.hasNext()) {
+					Map.Entry<String,String> pairs = (Map.Entry)it.next();
+					if (pairs.getKey() != null) {
+//						System.out.println(pairs.getKey() + " = " + pairs.getValue());
+                        jsonObject.put(pairs.getKey().toString(), pairs.getValue());
+					}
+                }                
+            }
+            if (jldPropertyValue.getPropertyMap() != null) {
+//				System.out.println(" values size: " + jldPropertyValue.getPropertyMap().size());
+                Iterator it = jldPropertyValue.getPropertyMap().entrySet().iterator();
+                while (it.hasNext()) {
+					Map.Entry<String,JsonLdProperty> pairs = (Map.Entry)it.next();
+					if (pairs.getKey() != null) {
+//						System.out.println(pairs.getKey() + " = " + pairs.getValue());
+						JsonLdProperty jldProperty = pairs.getValue();
+
+			            if (jldProperty.isSingleValued()) {
+			                putSingleValuedProperty(jsonObject, resource, jldProperty.getName(), jldProperty);
+			            }
+			            else {
+			                putMultiValuedProperty(jsonObject, resource, jldProperty.getName(), jldProperty);
+			            }
+						
+					}
+                }                
             }
         }
     }

@@ -17,7 +17,9 @@
 package org.apache.stanbol.commons.jsonld;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +58,25 @@ public class JsonLdParser extends JsonLdParserCommon {
 	}
 
 	/**
+	 * Parse the given String into a JSON-LD data structure without subject.
+	 * 
+	 * @param jsonLdString
+	 *            A JSON-LD String.
+	 * @return JSON-LD data structure.
+	 */
+	public static JsonLd parseExt(String jsonLdString) throws Exception {
+		JsonLd jld = null;
+
+		JSONObject jo = parseJson(jsonLdString);
+		if (jo != null) {
+			jld = new JsonLd();
+			parseSubjectExt(jo, jld, 1, null);
+		}
+
+		return jld;
+	}
+
+	/**
 	 * Parses a single subject.
 	 * 
 	 * @param jo
@@ -63,6 +84,7 @@ public class JsonLdParser extends JsonLdParserCommon {
 	 * @param jld
 	 *            JsonLd object to add the created subject resource.
 	 */
+	@SuppressWarnings("deprecation")
 	private static void parseSubject(JSONObject jo, JsonLd jld, int bnodeCount,
 			String profile) {
 
@@ -149,6 +171,103 @@ public class JsonLdParser extends JsonLdParserCommon {
 		}
 	}
 
+	/**
+	 * Parses a single subject if subject is undefined.
+	 * 
+	 * @param jo
+	 *            JSON object that holds the subject's data.
+	 * @param jld
+	 *            JsonLd object to add the created subject resource.
+	 */
+	@SuppressWarnings("deprecation")
+	private static void parseSubjectExt(JSONObject jo, JsonLd jld, int bnodeCount,
+			String profile) {
+
+		// The root subject is used for cases where no explicit subject is
+		// specified. We need
+		// at least one dummy subject (bnode) to support type coercion because
+		// types are assigned to
+		// subjects.
+		JsonLdResource subject = new JsonLdResource();
+
+		try {
+			if (jo.has(JsonLdCommon.CONTEXT)) {
+				JSONObject context = jo.getJSONObject(JsonLdCommon.CONTEXT);
+				for (int i = 0; i < context.names().length(); i++) {
+					String name = context.names().getString(i).toLowerCase();
+					if (name.equals(JsonLdCommon.COERCE)) {
+						JSONObject typeObject = context.getJSONObject(name);
+						for (int j = 0; j < typeObject.names().length(); j++) {
+							String property = typeObject.names().getString(j);
+							String type = typeObject.getString(property);
+							subject.putPropertyType(property, type);
+						}
+					} else {
+						jld.addNamespacePrefix(context.getString(name), name);
+					}
+				}
+
+				jo.remove(JsonLdCommon.CONTEXT);
+			}
+
+			// If there is a local profile specified for this subject, we
+			// use that one. Otherwise we assign the profile given by the
+			// parameter.
+			if (jo.has(JsonLdCommon.PROFILE)) {
+				String localProfile = unCURIE(jo
+						.getString(JsonLdCommon.PROFILE), jld
+						.getNamespacePrefixMap());
+				profile = localProfile;
+				jo.remove(JsonLdCommon.PROFILE);
+			}
+			subject.setProfile(profile);
+
+			if (jo.has(JsonLdCommon.ID)) {
+				// Check for N subjects
+				Object subjectObject = jo.get(JsonLdCommon.ID);
+				if (subjectObject instanceof JSONArray) {
+					// There is an array of subjects. We create all subjects
+					// in sequence.
+					JSONArray subjects = (JSONArray) subjectObject;
+					for (int i = 0; i < subjects.length(); i++) {
+						parseSubject(subjects.getJSONObject(i), jld,
+								bnodeCount++, profile);
+					}
+				} else {
+					String subjectName = unCURIE(jo
+							.getString(JsonLdCommon.ID), jld
+							.getNamespacePrefixMap());
+					subject.setSubject(subjectName);
+				}
+				jo.remove(JsonLdCommon.ID);
+			} else {
+				// No subject specified. We create a dummy bnode
+				// and add this subject.
+//				subject.setSubject("_:bnode" + bnodeCount);
+//				jld.put(subject.getSubject(), subject);
+				subject.setSubject("");
+				jld.put(subject.getSubject(), subject);
+			}
+
+			// Iterate through the rest of properties and unCURIE property
+			// values
+			// depending on their type
+			if (jo.names() != null && jo.names().length() > 0) {
+				for (int i = 0; i < jo.names().length(); i++) {
+					String property = jo.names().getString(i);
+					Object valueObject = jo.get(property);
+					handlePropertyExt(jld, subject, property, valueObject);
+				}
+			}
+
+		} catch (JSONException e) {
+			logger.error(
+					"There were JSON problems when parsing the JSON-LD String",
+					e);
+			e.printStackTrace();
+		}
+	}
+
 	private static void handleProperty(JsonLd jld, JsonLdResource subject,
 			String property, Object valueObject) {
 		if (valueObject instanceof JSONObject) {
@@ -166,6 +285,173 @@ public class JsonLdParser extends JsonLdParserCommon {
 		} else {
 			subject.putProperty(property, valueObject);
 		}
+	}
+
+    /**
+     * This method converts JSON string to map.
+     * @param value The input string
+     * @return resulting map
+     */
+    public static Map<String, String> splitToMap(String value) {
+    	String reg = "\",\"|\\},\"";
+        String[] arrValue = value.split(reg);
+        Map<String,String> res = new HashMap<String, String>();
+        for (String string : arrValue) {
+            String[] mapPair = string.split("\":\"");
+            res.put(mapPair[0], mapPair[1]);
+        }
+        return res;
+    }
+    
+    /**
+     * This method converts JSON string to array.
+     * @param value The input string
+     * @return resulting map
+     */
+    public static String[] splitToArray(String value) {
+        return value.split("\\},\\{");
+    }
+    
+    /**
+     * This method calculates end position for current key area.
+     * @param key
+     * @param keyList
+     * @param data
+     * @return next area position
+     */
+    private static int findNextKey(String key, List<String> keyList, String data) {
+    	int nextIdx = 0;
+    	Iterator<String> itr = keyList.iterator();
+    	int idx = 0;
+    	if (data != null && data.length() > 0) {
+	    	nextIdx = data.length();
+	    	if (data.contains(key)) {
+		    	idx = data.indexOf(key);
+		    	while (itr.hasNext()) {
+		    		String currentKey = itr.next();
+		    		currentKey = "\"" + currentKey + "\"";
+		        	if (data.contains(currentKey) && !currentKey.equals(key)) {
+		        		int curNextIdx = data.indexOf(currentKey);
+		        		if (curNextIdx > idx && curNextIdx < nextIdx) {
+		        			nextIdx = curNextIdx;
+		        		}
+		        	}
+		    	}
+	    	}
+    	}
+    	return nextIdx;
+    }
+    
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private static void handlePropertyExt(JsonLd jld, JsonLdResource subject,
+			String property, Object valueObject) {
+		
+		if (valueObject instanceof JSONObject) {			
+			JSONObject jsonValue = (JSONObject) valueObject;
+			String jsonValueStr = jsonValue.toString();
+			String jsonValueNormalized = normalize(jsonValueStr);
+			
+			JsonLdProperty jlp = new JsonLdProperty(property);
+			String mapString = jsonValueNormalized.substring(1, jsonValueNormalized.length() - 1); // remove braces
+			JsonLdPropertyValue jlpv = new JsonLdPropertyValue();
+			if (!mapString.contains("}")) {
+				/**
+				 * The property is a single map - without complex objects inside
+				 */
+				jlpv = parseJsonLdPropertyValue(mapString);
+				jlp.addValue(jlpv);
+			} else {
+				Map<String, String> propMap = 
+						(Map<String, String>) convertToMapAndList(jsonValue, jld.getNamespacePrefixMap());
+				List<String> keyList = new ArrayList<String>();
+				keyList.addAll(propMap.keySet());
+				Iterator<?> it = propMap.entrySet().iterator();
+				while (it.hasNext()) {
+				    Map.Entry pairs = (Map.Entry)it.next();
+				    String key = "\"" + pairs.getKey().toString() + "\"";
+				    int nextPos = findNextKey(key, keyList, mapString);
+				    int startPos = mapString.indexOf(key) + key.length() + 1; // +1 for ':'
+				    String value = mapString.substring(startPos, nextPos);
+				    if (value.lastIndexOf(",") == value.length() - 1) {
+					    value = value.substring(0, value.length() - 1);
+				    }
+					value = value.substring(1, value.length() - 1); // remove braces
+				    key = key.replace("\"", "");
+				    if (!value.contains(",")) {
+				    	if (!value.contains("\":\"")) {
+				    		/**
+				    		 * simple key value pair
+				    		 */				    	
+				    		jlpv.getValues().put(key, value);
+				    	} else {
+				    		/**
+				    		 * complex value with ':'
+				    		 */
+					        JsonLdProperty subProperty = new JsonLdProperty(key);
+							JsonLdPropertyValue sub_jlpv = new JsonLdPropertyValue();
+							Map<String, String> propMap2 = splitToMap(value);
+							Iterator<?> it2 = propMap2.entrySet().iterator();
+							while (it2.hasNext()) {
+							    Map.Entry pairs2 = (Map.Entry)it2.next();
+							    String key2 = pairs2.getKey().toString().replace("\"", "").replace("{", "").replace("}", "");
+							    String value2 = pairs2.getValue().toString();//.replace("\"", "").replace("{", "").replace("}", "");
+							    if (value2.length() < 2) {
+							    	value2 = "";
+							    }
+							    sub_jlpv.getValues().put(key2, value2);
+								subProperty.addValue(sub_jlpv);
+						        jlpv.putProperty(subProperty);
+							}
+				    	}
+				    } else {
+				        JsonLdProperty subProperty = new JsonLdProperty(key);
+						JsonLdPropertyValue sub_jlpv = parseJsonLdPropertyValue(value);
+						subProperty.addValue(sub_jlpv);
+				        jlpv.putProperty(subProperty);
+				    }
+				}
+				jlp.addValue(jlpv);
+			}
+			subject.putProperty(jlp);
+		} else if (valueObject instanceof JSONArray) {
+			JSONArray arrayValue = (JSONArray) valueObject;
+			String jsonValueStr = arrayValue.toString();
+			String jsonValueNormalized = normalize(jsonValueStr);
+			JsonLdProperty jlp = new JsonLdProperty(property);
+			String arrayString = jsonValueNormalized.substring(1, jsonValueNormalized.length() - 1);
+			String[] propArray = splitToArray(arrayString);
+			Iterator<String> itr = Arrays.asList(propArray).iterator();
+			while (itr.hasNext()) {
+				String propString = normalizeArrayString(itr.next());
+				JsonLdPropertyValue jlpv = parseJsonLdPropertyValue(propString);
+				jlp.addValue(jlpv);
+			}
+			subject.putProperty(jlp);
+		} else if (valueObject instanceof String) {
+			String stringValue = (String) valueObject;
+			subject.putProperty(property, unCURIE(stringValue, jld
+					.getNamespacePrefixMap()));
+		} else {
+			subject.putProperty(property, valueObject);
+		}
+	}
+
+	/**
+	 * This method parses the JsonLdPropertyValue string to the object.
+	 * @param mapString
+	 */
+	@SuppressWarnings("rawtypes")
+	private static JsonLdPropertyValue parseJsonLdPropertyValue(String mapString) {
+		JsonLdPropertyValue jlpv = new JsonLdPropertyValue();
+		Map<String, String> propMap = splitToMap(mapString);
+		Iterator<?> it = propMap.entrySet().iterator();
+		while (it.hasNext()) {
+		    Map.Entry pairs = (Map.Entry)it.next();
+		    String key = pairs.getKey().toString().replace("\"", "").replace("{", "").replace("}", "");
+		    String value = pairs.getValue().toString().replace("\"", "").replace("{", "").replace("}", "");
+		    jlpv.getValues().put(key, value);
+		}
+		return jlpv;
 	}
 
 	/**
@@ -265,4 +551,22 @@ public class JsonLdParser extends JsonLdParserCommon {
 		}
 		return curie;
 	}
+
+    private static String normalize(String value) {
+        String s = value;
+        s = s.replaceAll("\\\\\\\\", "\\\\");
+        s = s.replace("\\\"", "\"");
+        s = s.replace("\\", "");
+        s = s.replace("\\n", "\n");
+//        s = s.replace("\"", "");
+        return s;
+    }
+    
+    private static String normalizeArrayString(String value) {
+        String s = value;
+        s = s.replace("{", "");
+        s = s.replace("}", "");
+        return s;
+    }
+    
 }

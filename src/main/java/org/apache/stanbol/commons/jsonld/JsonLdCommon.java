@@ -50,13 +50,27 @@ public abstract class JsonLdCommon {
      */
     protected Map<String,String> usedNamespaces = new HashMap<String,String>();
 
-    /**
+	/**
      * Flag to control whether the namespace prefix map should be used to shorten URIs to CURIEs during
      * serialization. Default value is <code>true</code>.
      */
     protected boolean applyNamespaces = true;
 
     protected boolean useCuries = false;
+
+    /**
+     * @return
+     */
+    public Map<String, String> getUsedNamespaces() {
+		return usedNamespaces;
+	}
+
+	/**
+	 * @param usedNamespaces
+	 */
+	public void setUsedNamespaces(Map<String, String> usedNamespaces) {
+		this.usedNamespaces = usedNamespaces;
+	}
 
     /**
      * Get the known namespace to prefix mapping.

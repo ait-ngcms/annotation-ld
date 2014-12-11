@@ -202,12 +202,12 @@ public class JsonLdParser extends JsonLdParserCommon {
 							String type = typeObject.getString(property);
 							subject.putPropertyType(property, type);
 						}
-					} else {
-						jld.addNamespacePrefix(context.getString(name), name);
+//					} else {
+//						jld.addNamespacePrefix(context.getString(name), name);
 					}
 				}
 
-				jo.remove(JsonLdCommon.CONTEXT);
+//				jo.remove(JsonLdCommon.CONTEXT);
 			}
 
 			// If there is a local profile specified for this subject, we
@@ -545,10 +545,10 @@ public class JsonLdParser extends JsonLdParserCommon {
 	 */
 	private static String unCURIE(String curie,
 			Map<String, String> namespacePrefixMap) {
-		for (String namespace : namespacePrefixMap.keySet()) {
-			String prefix = namespacePrefixMap.get(namespace) + ":";
-			curie = curie.replaceAll(prefix, namespace);
-		}
+//		for (String namespace : namespacePrefixMap.keySet()) {
+//			String prefix = namespacePrefixMap.get(namespace) + ":";
+//			curie = curie.replaceAll(prefix, namespace);
+//		}
 		return curie;
 	}
 

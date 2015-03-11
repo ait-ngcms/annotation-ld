@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONObject;
 
 /**
  * The JsonLd class provides an API to create a JSON-LD object structure and to serialize this structure.
@@ -104,6 +105,18 @@ public class JsonLd extends JsonLdCommon {
 
             return JsonSerializer.toString(json);
         }
+    }
+
+    public Map<String,Object> getJsonMap() {
+         return createJsonMap();
+    }
+
+    public List<Object> getJsonList() {
+        return createJsonList();
+    }
+    
+    public JSONObject getAnnotationJson() {
+    	return new JSONObject(getJsonMap());
     }
 
     /**

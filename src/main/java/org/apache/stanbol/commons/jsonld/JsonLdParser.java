@@ -294,11 +294,28 @@ public class JsonLdParser extends JsonLdParserCommon {
      */
     public static Map<String, String> splitToMap(String value) {
     	String reg = "\",\"|\\},\"";
-        String[] arrValue = value.split(reg);
         Map<String,String> res = new HashMap<String, String>();
-        for (String string : arrValue) {
-            String[] mapPair = string.split("\":\"");
-            res.put(mapPair[0], mapPair[1]);
+//    	if (!value.isEmpty() && value.contains("#")) {
+        if (!value.isEmpty()) {
+//        	if (value.contains(",") && !value.contains("\",\"")) {
+//	        	reg = ",|\\},\"";
+//				value = value.substring(1, value.length() - 1); // remove braces
+//		        String[] arrValue = value.split(reg);
+//		        for (String string : arrValue) {
+//		            String[] mapPair = string.split(":");
+//		            res.put(mapPair[0], mapPair[1]);
+//		        }
+//	    	} else {
+		        String[] arrValue = value.split(reg);
+		        for (String string : arrValue) {
+		            String[] mapPair = string.split("\":\"");
+		            String right = "";
+		            if (mapPair.length > 1 && mapPair[1] != null)
+		            	right = mapPair[1].replace("\"", "");
+		            res.put(mapPair[0], right);
+//		            res.put(mapPair[0], mapPair[1]);
+//		        }
+	    	}
         }
         return res;
     }
@@ -310,6 +327,15 @@ public class JsonLdParser extends JsonLdParserCommon {
      */
     public static String[] splitToArray(String value) {
         return value.split("\\},\\{");
+    }
+    
+    /**
+     * This method converts Annotation JSON list string to array.
+     * @param value The input string
+     * @return resulting map
+     */
+    public static String[] splitAnnotationListStringToArray(String value) {
+        return value.split("\\}\\},\\{");
     }
     
     /**
@@ -404,10 +430,15 @@ public class JsonLdParser extends JsonLdParserCommon {
 							}
 				    	}
 				    } else {
-				        JsonLdProperty subProperty = new JsonLdProperty(key);
-						JsonLdPropertyValue sub_jlpv = parseJsonLdPropertyValue(value);
-						subProperty.addValue(sub_jlpv);
-				        jlpv.putProperty(subProperty);
+				    	if (value.contains(":") && value.contains("euType") && !key.equals("selector")) { // for the euType
+//					    	if (value.contains(":") && value.contains("#")) { // for the euType
+				    		jlpv.getValues().put(key, value);
+				    	} else {
+					        JsonLdProperty subProperty = new JsonLdProperty(key);
+							JsonLdPropertyValue sub_jlpv = parseJsonLdPropertyValue(value);
+							subProperty.addValue(sub_jlpv);
+					        jlpv.putProperty(subProperty);
+				    	}
 				    }
 				}
 				jlp.addValue(jlpv);

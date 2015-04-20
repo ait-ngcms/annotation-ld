@@ -59,11 +59,12 @@ public class JsonLdParser extends JsonLdParserCommon {
 
 	/**
 	 * Parse the given String into a JSON-LD data structure without subject.
-	 * 
+	 * Will be replaced through the annotation-utils.AnnotatioParser
 	 * @param jsonLdString
 	 *            A JSON-LD String.
 	 * @return JSON-LD data structure.
 	 */
+	@Deprecated
 	public static JsonLd parseExt(String jsonLdString) throws Exception {
 		JsonLd jld = null;
 
@@ -173,6 +174,7 @@ public class JsonLdParser extends JsonLdParserCommon {
 
 	/**
 	 * Parses a single subject if subject is undefined.
+	 * Will be replaced through the annotation-utils.AnnotatioParser
 	 * 
 	 * @param jo
 	 *            JSON object that holds the subject's data.
@@ -180,6 +182,7 @@ public class JsonLdParser extends JsonLdParserCommon {
 	 *            JsonLd object to add the created subject resource.
 	 */
 	@SuppressWarnings("deprecation")
+	@Deprecated  
 	private static void parseSubjectExt(JSONObject jo, JsonLd jld, int bnodeCount,
 			String profile) {
 
@@ -192,22 +195,29 @@ public class JsonLdParser extends JsonLdParserCommon {
 
 		try {
 			if (jo.has(JsonLdCommon.CONTEXT)) {
-				JSONObject context = jo.getJSONObject(JsonLdCommon.CONTEXT);
-				for (int i = 0; i < context.names().length(); i++) {
-					String name = context.names().getString(i).toLowerCase();
-					if (name.equals(JsonLdCommon.COERCE)) {
-						JSONObject typeObject = context.getJSONObject(name);
-						for (int j = 0; j < typeObject.names().length(); j++) {
-							String property = typeObject.names().getString(j);
-							String type = typeObject.getString(property);
-							subject.putPropertyType(property, type);
+				Object rawContextValue = jo.get(JsonLdCommon.CONTEXT);
+				
+				if(rawContextValue instanceof JSONObject){
+					JSONObject context = jo.getJSONObject(JsonLdCommon.CONTEXT);
+					for (int i = 0; i < context.names().length(); i++) {
+						String name = context.names().getString(i).toLowerCase();
+						if (name.equals(JsonLdCommon.COERCE)) {
+							JSONObject typeObject = context.getJSONObject(name);
+							for (int j = 0; j < typeObject.names().length(); j++) {
+								String property = typeObject.names().getString(j);
+								String type = typeObject.getString(property);
+								subject.putPropertyType(property, type);
+							}
+	//					} else {
+	//						jld.addNamespacePrefix(context.getString(name), name);
 						}
-//					} else {
-//						jld.addNamespacePrefix(context.getString(name), name);
 					}
+				}else if(rawContextValue instanceof String){
+					subject.putPropertyType("oa", (String)rawContextValue);
 				}
 
 //				jo.remove(JsonLdCommon.CONTEXT);
+
 			}
 
 			// If there is a local profile specified for this subject, we
@@ -259,6 +269,8 @@ public class JsonLdParser extends JsonLdParserCommon {
 					handlePropertyExt(jld, subject, property, valueObject);
 				}
 			}
+//			jld.put(subject.getSubject(), subject); //
+			jld.put(subject); //
 
 		} catch (JSONException e) {
 			logger.error(
@@ -369,8 +381,9 @@ public class JsonLdParser extends JsonLdParserCommon {
     }
     
 	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Deprecated
 	private static void handlePropertyExt(JsonLd jld, JsonLdResource subject,
-			String property, Object valueObject) {
+			String property, Object valueObject) throws JSONException {
 		
 		if (valueObject instanceof JSONObject) {			
 			JSONObject jsonValue = (JSONObject) valueObject;
@@ -380,6 +393,13 @@ public class JsonLdParser extends JsonLdParserCommon {
 			JsonLdProperty jlp = new JsonLdProperty(property);
 			String mapString = jsonValueNormalized.substring(1, jsonValueNormalized.length() - 1); // remove braces
 			JsonLdPropertyValue jlpv = new JsonLdPropertyValue();
+			
+			if(JsonLd.CONTEXT.equals(property)){
+				parseContext(jld, valueObject);
+				return;
+			}
+			
+			
 			if (!mapString.contains("}")) {
 				/**
 				 * The property is a single map - without complex objects inside
@@ -459,12 +479,35 @@ public class JsonLdParser extends JsonLdParserCommon {
 			}
 			subject.putProperty(jlp);
 		} else if (valueObject instanceof String) {
+//			JsonLdPropertyValue jlpv = new JsonLdPropertyValue();
+//			JsonLdProperty jlp = new JsonLdProperty(property);
+
 			String stringValue = (String) valueObject;
 			subject.putProperty(property, unCURIE(stringValue, jld
 					.getNamespacePrefixMap()));
+//    		jlpv.getValues().put(property, unCURIE(stringValue, jld
+//					.getNamespacePrefixMap()));
+//			jlp.addValue(jlpv);
 		} else {
+//			JsonLdPropertyValue jlpv = new JsonLdPropertyValue();
+//			JsonLdProperty jlp = new JsonLdProperty(property);
+
 			subject.putProperty(property, valueObject);
+//    		jlpv.getValues().put(property, (String) valueObject);
+//			jlp.addValue(jlpv);
 		}
+	}
+
+	private static void parseContext(JsonLd jld, Object valueObject)
+			throws JSONException {
+		HashMap< String, String> namespaces = new HashMap<String, String>();
+		String key;
+		for (@SuppressWarnings("rawtypes")
+		Iterator iterator = ((JSONObject) valueObject).keys(); iterator.hasNext();) {
+			key = (String) iterator.next();
+			namespaces.put(key, ((JSONObject) valueObject).getString(key));
+		}
+		jld.setNamespacePrefixMap(namespaces);
 	}
 
 	/**

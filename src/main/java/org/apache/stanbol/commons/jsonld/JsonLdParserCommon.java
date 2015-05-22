@@ -17,7 +17,6 @@
 package org.apache.stanbol.commons.jsonld;
 
 import org.apache.log4j.Logger;
-import org.apache.stanbol.commons.exception.JsonParseException;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -32,15 +31,15 @@ public abstract class JsonLdParserCommon {
      *            JSON String representation.
      * @return
      */
-	 protected static JSONObject parseJson(String jsonString) throws JsonParseException{
-	        JSONObject jo = null;
-	        try {
-	            jo = new JSONObject(jsonString);
-	        } catch (JSONException e) {
-	            logger.info("Could not parse JSON string: " + jsonString, e);
-	            throw new JsonParseException("Could not parse JSON string: " + jsonString, e);
-	        }
+    protected static JSONObject parseJson(String jsonString) throws JSONException {
+        JSONObject jo = null;
+        try {
+            jo = new JSONObject(jsonString);
+        } catch (JSONException e) {
+            logger.info("Could not parse JSON string: " + jsonString, e);
+            throw new JSONException("Could not parse JSON string: " + jsonString + e);
+        }
 
-	        return jo;
-	    }
+        return jo;
+    }
 }

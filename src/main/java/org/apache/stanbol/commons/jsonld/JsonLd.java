@@ -700,8 +700,6 @@ public class JsonLd extends JsonLdCommon {
 	 */
 	protected JsonLdProperty buildArrayProperty(String propertyName, String[] values) {
 
-		//asadsd
-		//test
 		if (values == null)
 			return null;
 

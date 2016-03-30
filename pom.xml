@@ -54,8 +54,12 @@
 	</dependencies>
 
 	<properties>
-		<version.log4j>1.2.12</version.log4j>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<version.java>1.7</version.java>
+		<version.log4j>1.2.12</version.log4j>		
 	</properties>
+	
 	<build>
 		<!-- configure source and output locations -->
 		<directory>target</directory>

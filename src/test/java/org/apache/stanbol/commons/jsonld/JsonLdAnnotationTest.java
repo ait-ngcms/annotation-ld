@@ -18,6 +18,9 @@ package org.apache.stanbol.commons.jsonld;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -189,6 +192,13 @@ public class JsonLdAnnotationTest {
 		}
         parsedJsonLd.setUseTypeCoercion(false);
         parsedJsonLd.setUseCuries(true);
+        parsedJsonLd.setApplyNamespaces(true);
+//        parsedJsonLd.setUseTypeCoercion(true);
+        
+        Map<String, String> usedNamameSpaces = new HashMap<String, String>();
+        usedNamameSpaces.put("http://www.w3.org/ns/oa-context-20130208.json","oa");
+        parsedJsonLd.setNamespacePrefixMap(usedNamameSpaces);
+        
         
         String parsedJsonLdStr = parsedJsonLd.toString();        
         System.out.println("### parsedJsonLdStr ###");

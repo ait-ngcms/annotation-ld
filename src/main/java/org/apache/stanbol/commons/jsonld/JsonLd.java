@@ -370,7 +370,10 @@ public class JsonLd extends JsonLdCommon {
 
 	private void putSimplifiedValue(Map<String, Object> jsonObject, String property, Map<String, Object> valueObject,
 			Map<String, String> coercionMap) throws ShorteningException {
-		Object convertedValue = convertValueType(valueObject.get(VALUE));
+		// #6
+		// DO NOT CONVERT STRINGS TO NUMBERS AUTOMATICALLY
+		//		Object convertedValue = convertValueType(valueObject.get(VALUE));
+		Object convertedValue = valueObject.get(VALUE);
 		if (convertedValue instanceof String) {
 			String strValue = (String) convertedValue;
 			String type = coercionMap.get(property);

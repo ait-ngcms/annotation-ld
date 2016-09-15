@@ -16,7 +16,7 @@
 
 	<groupId>at.ac.ait.ngcms</groupId>
 	<artifactId>annotation-ld</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1-RELEASE</version>
 	<name>annotation-ld</name>
 	<description>The Stanbol JSON-LD API to create JSON-LD structures with extensions for Open Annotation-LD.
   Parse them from String representation and to serialize them to Strings.

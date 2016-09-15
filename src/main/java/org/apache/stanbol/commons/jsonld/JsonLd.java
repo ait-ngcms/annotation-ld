@@ -507,6 +507,8 @@ public class JsonLd extends JsonLdCommon {
 			if (jldPropertyValue.getValue() != null) {
 				if(jldPropertyValue.getValue() instanceof Number)
 					jsonObject.put(VALUE, jldPropertyValue.getValue());
+				if(jldPropertyValue.getValue() instanceof Number)
+					jsonObject.put(VALUE, jldPropertyValue.getValue());
 				else
 					jsonObject.put(VALUE, jldPropertyValue.getLiteralValue());
 			}
@@ -741,10 +743,11 @@ public class JsonLd extends JsonLdCommon {
 		if (values.length == 1)
 			return new JsonLdProperty(propertyName, values[0]);
 
-		JsonLdProperty arrProperty = new JsonLdProperty(propertyName, values);
-//		for (int i = 0; i < values.length; i++) {
-//			arrProperty.addSingleValue(values[i]);
-//		}
+//		JsonLdProperty arrProperty = new JsonLdProperty(propertyName, Arrays.asList(values));
+		JsonLdProperty arrProperty = new JsonLdProperty(propertyName);
+		for (int i = 0; i < values.length; i++) {
+			arrProperty.addSingleValue(values[i]);
+		}
 		
 		return arrProperty;
 	}

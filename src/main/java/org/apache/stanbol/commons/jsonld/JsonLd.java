@@ -727,7 +727,7 @@ public class JsonLd extends JsonLdCommon {
 	 * build appropriate property representation for string arrays
 	 * 
 	 * @param propertyName
-	 * @param valueList
+	 * @param values
 	 * @return
 	 */
 	protected JsonLdProperty buildArrayProperty(String propertyName, String[] values) {
@@ -750,7 +750,8 @@ public class JsonLd extends JsonLdCommon {
 	 * build appropriate property representation for string arrays
 	 * 
 	 * @param propertyName
-	 * @param valueList
+	 * @param values
+	 * @param solrFieldPrefix
 	 * @return
 	 */
 	protected JsonLdProperty buildMapProperty(String propertyName, Map<String, List<String>> values,

@@ -505,7 +505,10 @@ public class JsonLd extends JsonLdCommon {
 		} else if (value instanceof JsonLdPropertyValue) {
 			JsonLdPropertyValue jldPropertyValue = (JsonLdPropertyValue) value;
 			if (jldPropertyValue.getValue() != null) {
-				jsonObject.put(VALUE, jldPropertyValue.getLiteralValue());
+				if(jldPropertyValue.getValue() instanceof Number)
+					jsonObject.put(VALUE, jldPropertyValue.getValue());
+				else
+					jsonObject.put(VALUE, jldPropertyValue.getLiteralValue());
 			}
 			String type = coercionMap.get(property);
 			if (type != null) {

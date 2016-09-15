@@ -739,7 +739,7 @@ public class JsonLdTest {
         jsonLd.addNamespacePrefix("http://xmlns.com/foaf/0.1/", "foaf");
         
         JsonLdResource r1 = new JsonLdResource();
-        r1.putProperty("foaf:age", 31);
+        r1.putProperty("foaf:age", "31");
         r1.putPropertyType("foaf:age", "http://www.w3.org/2001/XMLSchema#int");
         jsonLd.put(r1);
         
@@ -760,12 +760,12 @@ public class JsonLdTest {
         
         JsonLdResource r1 = new JsonLdResource();
         r1.setSubject("_:bnode1");
-        r1.putProperty("foaf:age", 31.533567);
+        r1.putProperty("foaf:age", Float.valueOf(31.533567f).toString());
         r1.putPropertyType("foaf:age", "http://www.w3.org/2001/XMLSchema#int");
         jsonLd.put(r1);
         
         String actual = jsonLd.toString();
-        String expected = "{\"@context\":{\"foaf\":\"http://xmlns.com/foaf/0.1/\",\"foaf:age\":{\"@type\":\"xsd:int\"},\"xsd\":\"http://www.w3.org/2001/XMLSchema#\"},\"@id\":\"_:bnode1\",\"foaf:age\":31.533567}";
+        String expected = "{\"@context\":{\"foaf\":\"http://xmlns.com/foaf/0.1/\",\"foaf:age\":{\"@type\":\"xsd:int\"},\"xsd\":\"http://www.w3.org/2001/XMLSchema#\"},\"@id\":\"_:bnode1\",\"foaf:age\":\"31.533567\"}";
         assertEquals(expected, actual);        
     }
     
@@ -943,7 +943,7 @@ public class JsonLdTest {
         
         JsonLdProperty ageProperty = new JsonLdProperty("http://xmlns.com/foaf/0.1/age");
         
-        JsonLdPropertyValue v1 = new JsonLdPropertyValue(31.533567);
+        JsonLdPropertyValue v1 = new JsonLdPropertyValue("31.533567");
         v1.setType("xsd:Float");
         ageProperty.addValue(v1);
 
@@ -980,7 +980,7 @@ public class JsonLdTest {
         r1.addType("foaf:name");
         
         JsonLdProperty ageProperty = new JsonLdProperty("http://xmlns.com/foaf/0.1/age");
-        JsonLdPropertyValue v1 = new JsonLdPropertyValue(31.533567);
+        JsonLdPropertyValue v1 = new JsonLdPropertyValue("31.533567");
         v1.setType("xsd:Float");
         ageProperty.addValue(v1);
 

@@ -67,7 +67,7 @@ public class JsonLd extends JsonLdCommon {
 	 * with an empty String as key the resource will be added using an empty
 	 * String ("") as key. Otherwise an @IllegalArgumentException is thrown.
 	 * 
-	 * @param resource
+	 * @param resource the main resource
 	 */
 	public void put(JsonLdResource resource) {
 		if (resource.getSubject() != null) {
@@ -82,8 +82,8 @@ public class JsonLd extends JsonLdCommon {
 	/**
 	 * Add the given resource to this JsonLd object using the resourceId as key.
 	 * 
-	 * @param resourceId
-	 * @param resource
+	 * @param resourceId the id of the main resource 
+	 * @param resource the 
 	 */
 	public void put(String resourceId, JsonLdResource resource) {
 		this.resourceMap.put(resourceId, resource);
@@ -923,7 +923,8 @@ public class JsonLd extends JsonLdCommon {
 	 * build appropriate property representation for string arrays
 	 * 
 	 * @param propertyName
-	 * @param valueList
+	 * @param values
+	 * @param solrFieldPrefix
 	 * @return
 	 */
 	protected JsonLdProperty buildMapOfEntityReferenceProperty(String propertyName, Map<String, List<String>> values,

@@ -719,13 +719,14 @@ public class JsonLd extends JsonLdCommon {
 	 * @return
 	 */
 	protected JsonLdProperty buildListProperty(String propertyName, List<String> valueList) {
-//		return buildArrayProperty(propertyName, (String[]) valueList.toArray());
-		if (valueList == null)
-			return null;
-
-		if (valueList.size() == 1)
-			return new JsonLdProperty(propertyName, valueList.get(0));
-		return new JsonLdProperty(propertyName, valueList);
+		return buildArrayProperty(propertyName, (String[]) valueList.toArray());
+//TODO: #8 revert the implementation when correct serialization of String[] and List<String> is implemented 
+		//		if (valueList == null)
+//			return null;
+//
+//		if (valueList.size() == 1)
+//			return new JsonLdProperty(propertyName, valueList.get(0));
+//		return new JsonLdProperty(propertyName, valueList);
 	}
 
 	/**
@@ -742,7 +743,7 @@ public class JsonLd extends JsonLdCommon {
 
 		if (values.length == 1)
 			return new JsonLdProperty(propertyName, values[0]);
-
+		//TODO: #8 revert the implementation when correct serialization of String[] and List<String> is implemented 
 //		JsonLdProperty arrProperty = new JsonLdProperty(propertyName, Arrays.asList(values));
 		JsonLdProperty arrProperty = new JsonLdProperty(propertyName);
 		for (int i = 0; i < values.length; i++) {

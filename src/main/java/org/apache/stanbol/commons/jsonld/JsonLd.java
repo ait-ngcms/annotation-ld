@@ -719,7 +719,7 @@ public class JsonLd extends JsonLdCommon {
 	 * @return
 	 */
 	protected JsonLdProperty buildListProperty(String propertyName, List<String> valueList) {
-		return buildArrayProperty(propertyName, (String[]) valueList.toArray());
+		return buildArrayProperty(propertyName, valueList.toArray(new String[valueList.size()]));//avoid class cast exception
 //TODO: #8 revert the implementation when correct serialization of String[] and List<String> is implemented 
 		//		if (valueList == null)
 //			return null;

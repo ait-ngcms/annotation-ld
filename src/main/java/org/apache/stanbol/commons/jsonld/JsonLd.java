@@ -1046,7 +1046,7 @@ public class JsonLd extends JsonLdCommon {
 		putStringArrayProperty(fieldName, array, jsonLdResource, true);
 	}
 
-	public Logger getLogger() {
+	protected Logger getLogger() {
 		if(logger == null)
 			logger = Logger.getLogger(JsonLd.class);
 		return logger ;

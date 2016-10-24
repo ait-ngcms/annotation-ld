@@ -21,11 +21,15 @@ import static org.junit.Assert.assertNotNull;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 
 /**
@@ -159,7 +163,28 @@ public class JsonLdAnnotationTest {
         System.out.println("### jsonLdOriginal ###");
         toConsole(jsonLd.toString());
         
-        Gson gson = new Gson();
+        //quickFix for the test
+        ExclusionStrategy excludeLogger = new ExclusionStrategy() {
+			
+			@Override
+			public boolean shouldSkipField(FieldAttributes f) {
+				if("logger".equals(f.getName()))
+					return true;
+				return false;
+			}
+			
+			@Override
+			public boolean shouldSkipClass(Class<?> clazz) {
+				if(Logger.class.equals(clazz))
+					return true;
+					
+				return false;
+			}
+		};
+       
+        
+        Gson gson = new GsonBuilder().addSerializationExclusionStrategy(excludeLogger).create(); 
+               
         String jsonLdSerializedString = gson.toJson(jsonLd, JsonLd.class);
         System.out.println("### jsonLdSerializedString ###");
         toConsole(jsonLdSerializedString);

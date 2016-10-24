@@ -1021,12 +1021,24 @@ public class JsonLd extends JsonLdCommon {
 	 * @param jsonLdResource
 	 */
 	protected void putListProperty(String fieldName, List<String> list, JsonLdResource jsonLdResource) {
+		putListProperty(fieldName, list, jsonLdResource, false);
+				
+	}
 
-		JsonLdProperty arrayProperty = buildListProperty(fieldName, list, true);
+	/**
+	 * TODO: move to AnnotationLd
+	 * @param fieldName
+	 * @param list
+	 * @param jsonLdResource
+	 */
+	protected void putListProperty(String fieldName, List<String> list, JsonLdResource jsonLdResource, boolean minimized) {
+
+		JsonLdProperty arrayProperty = buildListProperty(fieldName, list, minimized);
 		if(arrayProperty != null)
 			jsonLdResource.putProperty(arrayProperty);		
 	}
 
+	
 	/**
 	 * @param fieldName
 	 * @param array

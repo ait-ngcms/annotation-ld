@@ -868,7 +868,6 @@ public class JsonLd extends JsonLdCommon {
 	}
 
 	/**
-	 * TODO: move to JsonLd
 	 * @param propName
 	 * @param mapOfStringList
 	 * @param mapKeyPrefix
@@ -911,13 +910,10 @@ public class JsonLd extends JsonLdCommon {
 
 	
 	/**
-	 * move to JsonLd class
-	 * 
 	 * @param propertyName
 	 * @param values
 	 * @param solrFieldPrefix
 	 * @return
-	 * @deprecated
 	 */
 	protected JsonLdProperty buildMapOfStringsProperty(String propertyName, Map<String, String> values,
 			String solrFieldPrefix) {
@@ -1043,7 +1039,7 @@ public class JsonLd extends JsonLdCommon {
 	}
 	
 	protected void putStringArrayProperty(String fieldName, String[] array, JsonLdResource jsonLdResource) {
-		putStringArrayProperty(fieldName, array, jsonLdResource, true);
+		putStringArrayProperty(fieldName, array, jsonLdResource, false);
 	}
 
 	protected Logger getLogger() {

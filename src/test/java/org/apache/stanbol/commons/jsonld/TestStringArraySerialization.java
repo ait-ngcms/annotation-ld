@@ -32,6 +32,7 @@ public class TestStringArraySerialization {
 		assertEquals(actual, expected);
 	}
 	
+	
 	@Test
 	public void testStringArraySize2() {
 		String[] array = new String[]{val1, val2};

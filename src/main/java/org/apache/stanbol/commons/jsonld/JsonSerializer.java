@@ -17,8 +17,10 @@
 package org.apache.stanbol.commons.jsonld;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -35,6 +37,8 @@ public final class JsonSerializer {
      * Restrict instantiation
      */
     private JsonSerializer() {}
+    
+    private static Set<String> containerProps = new HashSet<String>();
 
     public static String toString(Map<String,Object> jsonMap) {
         StringBuffer sb = new StringBuffer();
@@ -81,7 +85,8 @@ public final class JsonSerializer {
             } else {
                 sb.append(": ");
             }
-            appendValueOf(jsonMap.get(key), sb, indent, level);
+            
+            appendValueOf(jsonMap.get(key), sb, indent, level, isContainerProp(key));
         }
         removeOddChars(sb, indent);
         level = decreaseIndentationLevel(sb, indent, level);
@@ -91,7 +96,7 @@ public final class JsonSerializer {
     }
 
     @SuppressWarnings("unchecked")
-    private static void appendValueOf(Object object, StringBuffer sb, int indent, int level) {
+    private static void appendValueOf(Object object, StringBuffer sb, int indent, int level, boolean isContainer) {
         if (object == null) {
             return;
         }
@@ -106,9 +111,9 @@ public final class JsonSerializer {
             appendJsonMap(mapValue, sb, indent, level);
         } else if (object instanceof List<?>) {
             List<Object> lstValue = (List<Object>) object;
-            if (lstValue.size() == 1) {
+            if (lstValue.size() == 1 && !isContainer) {
                 // if the list contains only 1 element, we can serialize it as a single value
-                appendValueOf(lstValue.get(0), sb, indent, level);
+                appendValueOf(lstValue.get(0), sb, indent, level, isContainer);
             }
             else {
                 // the list has more or no elements
@@ -126,7 +131,7 @@ public final class JsonSerializer {
             } catch (JSONException e) {
                 // ignore
             }
-            appendValueOf(jsonList, sb, indent, level);
+            appendValueOf(jsonList, sb, indent, level, isContainer);
         } else {
             sb.append(object.toString());
             sb.append(',');
@@ -139,7 +144,8 @@ public final class JsonSerializer {
         level = increaseIndentationLevel(sb, indent, level);
         for (Object object : jsonArray) {
             appendIndentation(sb, indent, level);
-            appendValueOf(object, sb, indent, level);
+            //array serialization doesn't use the isContainerProp() construct. They are individually set to minimized/verbose serialization
+            appendValueOf(object, sb, indent, level, false);
         }
         removeOddChars(sb, indent);
         level = decreaseIndentationLevel(sb, indent, level);
@@ -230,5 +236,31 @@ public final class JsonSerializer {
                 sb.deleteCharAt(sb.length() - 1);
             }
         }
+    }
+    
+    /**
+     * register container properties which have to be always serialized as arrays
+     * @param prop
+     */
+    public static void registerContainerProp(String prop){
+    	if (!containerProps.contains(prop))
+    		containerProps.add(prop);
+    }
+    
+    /**
+     * register container properties which have to be always serialized as arrays
+     * @param props
+     */
+    public static void registerContainerProp(String[] props){
+    	for (String prop : props)
+    		registerContainerProp(prop);
+		
+    }
+    
+    public static boolean isContainerProp(String prop){
+    	if(containerProps != null && containerProps.contains(prop))
+    		return true;
+    	
+    	return false;
     }
 }

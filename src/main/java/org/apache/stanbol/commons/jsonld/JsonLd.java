@@ -40,8 +40,7 @@ import org.codehaus.jettison.json.JSONObject;
 public class JsonLd extends JsonLdCommon {
 
 	@SuppressWarnings("unused")
-	// TODO: create getLogger() method
-	private static final Logger logger = Logger.getLogger(JsonLd.class);
+	private Logger logger;
 
 	/**
 	 * Map Subject -> Resource
@@ -67,7 +66,7 @@ public class JsonLd extends JsonLdCommon {
 	 * with an empty String as key the resource will be added using an empty
 	 * String ("") as key. Otherwise an @IllegalArgumentException is thrown.
 	 * 
-	 * @param resource
+	 * @param resource the main resource
 	 */
 	public void put(JsonLdResource resource) {
 		if (resource.getSubject() != null) {
@@ -82,8 +81,8 @@ public class JsonLd extends JsonLdCommon {
 	/**
 	 * Add the given resource to this JsonLd object using the resourceId as key.
 	 * 
-	 * @param resourceId
-	 * @param resource
+	 * @param resourceId the id of the main resource 
+	 * @param resource the 
 	 */
 	public void put(String resourceId, JsonLdResource resource) {
 		this.resourceMap.put(resourceId, resource);
@@ -385,10 +384,11 @@ public class JsonLd extends JsonLdCommon {
 	}
 
 	protected void putArrayProperty(JsonLdPropertyValue entityPreviewPropValue, String propertyName,
-			String[] propertyValue) {
+			String[] propertyValue, boolean minimized) {
 		if (propertyValue != null)
 			entityPreviewPropValue
-				.putProperty(buildArrayProperty(propertyName, propertyValue));
+				.putProperty(buildArrayProperty(propertyName, propertyValue, minimized));
+		
 	}
 	
 	private void putSimplifiedValue(Map<String, Object> jsonObject, String property, Map<String, Object> valueObject,
@@ -505,7 +505,13 @@ public class JsonLd extends JsonLdCommon {
 		} else if (value instanceof JsonLdPropertyValue) {
 			JsonLdPropertyValue jldPropertyValue = (JsonLdPropertyValue) value;
 			if (jldPropertyValue.getValue() != null) {
-				jsonObject.put(VALUE, jldPropertyValue.getLiteralValue());
+				if(jldPropertyValue.getValue() instanceof Number)
+					jsonObject.put(VALUE, jldPropertyValue.getValue());
+				else if (jldPropertyValue.getValue() instanceof String[]){
+					jsonObject.put(VALUE, serializeArray((String[]) jldPropertyValue.getValue()));
+				}else{
+					jsonObject.put(VALUE, jldPropertyValue.getLiteralValue());
+				}
 			}
 			String type = coercionMap.get(property);
 			if (type != null) {
@@ -514,13 +520,10 @@ public class JsonLd extends JsonLdCommon {
 			if (jldPropertyValue.getType() != null) {
 				jsonObject.put(TYPE, shortenURIWithCuries(jldPropertyValue.getType()));
 			}
-			if (jldPropertyValue.getTypes() != null && jldPropertyValue.getTypes().size() > 0) {
-				Iterator<String> itr = jldPropertyValue.getTypes().iterator();
-				String types = "[";
-				while (itr.hasNext()) {
-					types = types + itr.next() + ", ";
-				}
-				jsonObject.put(TYPE, types.substring(0, types.length() - 2) + "]");
+			List<String> stringList = jldPropertyValue.getTypes();
+			if (stringList != null && stringList.size() > 0) {
+				StringBuilder builder = serializeList(stringList); 
+				jsonObject.put(TYPE, builder.toString());
 			}
 			if (jldPropertyValue.getLanguage() != null) {
 				jsonObject.put(LANGUAGE, jldPropertyValue.getLanguage());
@@ -559,6 +562,37 @@ public class JsonLd extends JsonLdCommon {
 				}
 			}
 		}
+	}
+
+	private StringBuilder serializeList(List<String> stringList) {
+		StringBuilder builder = new StringBuilder("[");
+		for (String stringValue : stringList) {
+			builder.append(stringValue);
+			builder.append(", ");
+		}
+		//remove last ", "
+		builder.deleteCharAt(builder.length() -1);
+		builder.deleteCharAt(builder.length() -1);
+		
+		builder.append("]");
+		return builder;
+	}
+	
+	private StringBuilder serializeArray(String[] stringList) {
+		StringBuilder builder = new StringBuilder("[");
+//		StringBuilder builder = new StringBuilder();
+			for (String stringValue : stringList) {
+			builder.append("\"");
+			builder.append(stringValue);
+			builder.append("\", ");
+		}
+		//remove last ", "
+		builder.deleteCharAt(builder.length() -1);
+		builder.deleteCharAt(builder.length() -1);
+		builder.append("]");
+		
+		//do not return builder.toString(), it will break the serialization 
+		return builder;
 	}
 
 	/**
@@ -713,44 +747,43 @@ public class JsonLd extends JsonLdCommon {
 	 * @param valueList
 	 * @return
 	 */
-	protected JsonLdProperty buildListProperty(String propertyName, List<String> valueList) {
-//		return buildArrayProperty(propertyName, (String[]) valueList.toArray());
-		if (valueList == null)
-			return null;
-
-		if (valueList.size() == 1)
-			return new JsonLdProperty(propertyName, valueList.get(0));
-		return new JsonLdProperty(propertyName, valueList);
+	protected JsonLdProperty buildListProperty(String propertyName, List<String> valueList, boolean minimized) {
+		return buildArrayProperty(propertyName, valueList.toArray(new String[valueList.size()]), minimized);//avoid class cast exception
 	}
 
 	/**
 	 * build appropriate property representation for string arrays
 	 * 
 	 * @param propertyName
-	 * @param valueList
+	 * @param values
+	 * @param minimized 
 	 * @return
 	 */
-	protected JsonLdProperty buildArrayProperty(String propertyName, String[] values) {
+	protected JsonLdProperty buildArrayProperty(String propertyName, String[] values, boolean minimized) {
 
 		if (values == null)
 			return null;
 
-		if (values.length == 1)
+		if (values.length == 1 && minimized)
 			return new JsonLdProperty(propertyName, values[0]);
-
+		//TODO: #8 revert the implementation when correct serialization of String[] and List<String> is implemented 
 		JsonLdProperty arrProperty = new JsonLdProperty(propertyName, values);
+		
+//		JsonLdProperty arrProperty = new JsonLdProperty(propertyName);
 //		for (int i = 0; i < values.length; i++) {
 //			arrProperty.addSingleValue(values[i]);
 //		}
 		
 		return arrProperty;
 	}
+
 	
 	/**
 	 * build appropriate property representation for string arrays
 	 * 
 	 * @param propertyName
-	 * @param valueList
+	 * @param values
+	 * @param solrFieldPrefix
 	 * @return
 	 */
 	protected JsonLdProperty buildMapProperty(String propertyName, Map<String, List<String>> values,
@@ -773,11 +806,8 @@ public class JsonLd extends JsonLdCommon {
 				key = key.substring(prefixLength);
 			}
 			
-//			entryProperty = new JsonLdProperty(key);
-//			for (String listEntry : entry.getValue()) {
-//				entryProperty.addSingleValue(listEntry);
-//			}
-			entryProperty = new JsonLdProperty(key, entry.getValue());
+			entryProperty = buildListProperty(key, entry.getValue(), true);
+					
 			mapPropertyValue.putProperty(entryProperty);			
 		}
 		
@@ -817,7 +847,7 @@ public class JsonLd extends JsonLdCommon {
 //		String listString = TypeUtils.getTypeListAsStr(list);
 //		if (!StringUtils.isBlank(listString))
 //			propertyValue.getValues().put(field, listString);
-		JsonLdProperty prop = buildListProperty(field, list);
+		JsonLdProperty prop = buildListProperty(field, list, true);
 		if(prop!= null)
 			propertyValue.putProperty(prop); 
 	}
@@ -838,7 +868,6 @@ public class JsonLd extends JsonLdCommon {
 	}
 
 	/**
-	 * TODO: move to JsonLd
 	 * @param propName
 	 * @param mapOfStringList
 	 * @param mapKeyPrefix
@@ -881,13 +910,10 @@ public class JsonLd extends JsonLdCommon {
 
 	
 	/**
-	 * move to JsonLd class
-	 * 
 	 * @param propertyName
 	 * @param values
 	 * @param solrFieldPrefix
 	 * @return
-	 * @deprecated
 	 */
 	protected JsonLdProperty buildMapOfStringsProperty(String propertyName, Map<String, String> values,
 			String solrFieldPrefix) {
@@ -923,7 +949,8 @@ public class JsonLd extends JsonLdCommon {
 	 * build appropriate property representation for string arrays
 	 * 
 	 * @param propertyName
-	 * @param valueList
+	 * @param values
+	 * @param solrFieldPrefix
 	 * @return
 	 */
 	protected JsonLdProperty buildMapOfEntityReferenceProperty(String propertyName, Map<String, List<String>> values,
@@ -994,26 +1021,43 @@ public class JsonLd extends JsonLdCommon {
 	 * @param jsonLdResource
 	 */
 	protected void putListProperty(String fieldName, List<String> list, JsonLdResource jsonLdResource) {
-//		if (list != null) {
-//			String[] array = list.toArray(new String[0]);
-//			putStringArrayProperty(fieldName, array, jsonLdResource);
-//		}
-//		JsonLdProperty arrayProperty = buildArrayProperty(fieldName, array);
-		JsonLdProperty arrayProperty = buildListProperty(fieldName, list);
+		putListProperty(fieldName, list, jsonLdResource, false);
+				
+	}
+
+	/**
+	 * TODO: move to AnnotationLd
+	 * @param fieldName
+	 * @param list
+	 * @param jsonLdResource
+	 */
+	protected void putListProperty(String fieldName, List<String> list, JsonLdResource jsonLdResource, boolean minimized) {
+
+		JsonLdProperty arrayProperty = buildListProperty(fieldName, list, minimized);
 		if(arrayProperty != null)
 			jsonLdResource.putProperty(arrayProperty);		
 	}
 
+	
 	/**
-	 * TODO: move to JsonLd 
 	 * @param fieldName
 	 * @param array
 	 * @param jsonLdResource
 	 */
-	protected void putStringArrayProperty(String fieldName, String[] array, JsonLdResource jsonLdResource) {
-		JsonLdProperty arrayProperty = buildArrayProperty(fieldName, array);
+	protected void putStringArrayProperty(String fieldName, String[] array, JsonLdResource jsonLdResource, boolean minimized) {
+		JsonLdProperty arrayProperty = buildArrayProperty(fieldName, array, minimized);
 		if(arrayProperty != null)
 			jsonLdResource.putProperty(arrayProperty);
+	}
+	
+	protected void putStringArrayProperty(String fieldName, String[] array, JsonLdResource jsonLdResource) {
+		putStringArrayProperty(fieldName, array, jsonLdResource, false);
+	}
+
+	protected Logger getLogger() {
+		if(logger == null)
+			logger = Logger.getLogger(JsonLd.class);
+		return logger ;
 	}
 	
 }

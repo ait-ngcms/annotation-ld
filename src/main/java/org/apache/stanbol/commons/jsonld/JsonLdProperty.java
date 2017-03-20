@@ -90,7 +90,9 @@ public class JsonLdProperty {
     }
 
     public boolean isSingleValued() {
-        return this.values.size() == 1;
+        return this.values.size() == 1 && 
+        		//if not String[]
+        		(!(this.values.get(0).getValue() instanceof String[]));
     }
     
     public boolean isTyped() {

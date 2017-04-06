@@ -18,13 +18,17 @@ package org.apache.stanbol.commons.jsonld;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
+import javax.xml.ws.spi.WebServiceFeatureAnnotation;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONObject;
@@ -41,7 +45,12 @@ public class JsonLd extends JsonLdCommon {
 
 	@SuppressWarnings("unused")
 	private Logger logger;
-
+	
+	
+	public JsonLd(){
+		super();
+	}
+	
 	/**
 	 * Map Subject -> Resource
 	 */
@@ -340,7 +349,7 @@ public class JsonLd extends JsonLdCommon {
 		for (String property : resource.getPropertyMap().keySet()) {
 			JsonLdProperty jldProperty = resource.getPropertyMap().get(property);
 
-			if (jldProperty.isSingleValued()) {
+			if (!isContainerProperty(property) && jldProperty.isSingleValued()) {
 				putSingleValuedProperty(jsonObject, resource, property, jldProperty);
 			} else {
 				putMultiValuedProperty(jsonObject, resource, property, jldProperty);
@@ -552,7 +561,7 @@ public class JsonLd extends JsonLdCommon {
 						// pairs.getValue());
 						JsonLdProperty jldProperty = pairs.getValue();
 
-						if (jldProperty.isSingleValued()) {
+						if (!isContainerProperty(property) && jldProperty.isSingleValued()) {
 							putSingleValuedProperty(jsonObject, resource, jldProperty.getName(), jldProperty);
 						} else {
 							putMultiValuedProperty(jsonObject, resource, jldProperty.getName(), jldProperty);
@@ -1059,5 +1068,17 @@ public class JsonLd extends JsonLdCommon {
 			logger = Logger.getLogger(JsonLd.class);
 		return logger ;
 	}
+	
+	
+	
+	public void registerContainerProperty(String property){
+		//container properties are registered in a static list see JsonSerializer.registerContainerProp()
+		JsonSerializer.registerContainerProp(property);
+	}
+	
+	public boolean isContainerProperty(String property){
+		return JsonSerializer.isContainerProp(property);
+	}
+	
 	
 }

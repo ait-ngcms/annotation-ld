@@ -243,7 +243,8 @@ public abstract class JsonLdCommon {
     }
 
     public String unCURIE(String uri) {
-        if (uri != null) {
+        //only if namespace prefix is used  
+    	if (uri != null && uri.contains(":")) {
             for (String namespace : namespacePrefixMap.keySet()) {
                 String prefix = namespacePrefixMap.get(namespace);
                 String prefixEx = prefix + ":";

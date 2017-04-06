@@ -473,13 +473,18 @@ public class JsonLd extends JsonLdCommon {
 				// If the returned value object contains only one @value value,
 				// we can simplify the value by admitting the @value.
 				addSimplifiedValue(valueList, valueObject);
+				
 			} else {
 				valueList.add(valueObject);
 			}
 
 		}
 
-		jsonObject.put(shortenURI(property), valueList);
+		//StringBuilder is the serialized representation of String[]. Avoid double encoding into arrays 
+		if(valueList.size() == 1 && valueList.get(0) instanceof StringBuilder)
+			jsonObject.put(shortenURI(property), valueList.get(0));
+		else
+			jsonObject.put(shortenURI(property), valueList);
 	}
 
 	private void simplifyIRI(Map<String, Object> valueObject) throws ShorteningException {
@@ -530,14 +535,14 @@ public class JsonLd extends JsonLdCommon {
 				jsonObject.put(TYPE, shortenURIWithCuries(jldPropertyValue.getType()));
 			}
 			List<String> stringList = jldPropertyValue.getTypes();
-			if (stringList != null && stringList.size() > 0) {
+			if (stringList != null && !stringList.isEmpty()) {
 				StringBuilder builder = serializeList(stringList); 
 				jsonObject.put(TYPE, builder.toString());
 			}
 			if (jldPropertyValue.getLanguage() != null) {
 				jsonObject.put(LANGUAGE, jldPropertyValue.getLanguage());
 			}
-			if (jldPropertyValue.getValues() != null) {
+			if (jldPropertyValue.getValues() != null && !jldPropertyValue.getValues().isEmpty()) {
 				// System.out.println(" values size: " +
 				// jldPropertyValue.getValues().size());
 				Iterator it = jldPropertyValue.getValues().entrySet().iterator();
@@ -550,7 +555,7 @@ public class JsonLd extends JsonLdCommon {
 					}
 				}
 			}
-			if (jldPropertyValue.getPropertyMap() != null) {
+			if (jldPropertyValue.getPropertyMap() != null && ! jldPropertyValue.getPropertyMap().isEmpty()) {
 				// System.out.println(" values size: " +
 				// jldPropertyValue.getPropertyMap().size());
 				Iterator it = jldPropertyValue.getPropertyMap().entrySet().iterator();

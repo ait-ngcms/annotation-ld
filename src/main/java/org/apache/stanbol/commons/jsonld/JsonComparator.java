@@ -17,6 +17,7 @@
 package org.apache.stanbol.commons.jsonld;
 
 import java.util.Comparator;
+import java.util.HashMap;
 
 /**
  * A comparator for JSON-LD maps to ensure the order of certain key elements
@@ -25,33 +26,31 @@ import java.util.Comparator;
  * @author Fabian Christ
  */
 public class JsonComparator implements Comparator<Object> {
+	
+	static final HashMap<String, Integer> propOrderMap = new HashMap<String, Integer>();
+	static {
+		propOrderMap.put(JsonLdCommon.CONTEXT, 10);
+		propOrderMap.put(JsonLdCommon.ID, 20);
+		propOrderMap.put(JsonLdCommon.TYPE, 30);
+		propOrderMap.put(JsonLdCommon.CREATED, 40);
+		propOrderMap.put(JsonLdCommon.CREATOR, 50);
+		propOrderMap.put(JsonLdCommon.GENERATED, 60);
+		propOrderMap.put(JsonLdCommon.GENERATOR, 70);
+		propOrderMap.put(JsonLdCommon.BODY, 80);
+		propOrderMap.put(JsonLdCommon.TARGET, 90);
+		propOrderMap.put(JsonLdCommon.VIA, 100);
+	}
 
     @Override
     public int compare(Object arg0, Object arg1) {
-        int value;
-        if (arg0.equals(arg1)) {
-            value = 0;
-        } else if (arg0.equals(JsonLdCommon.CONTEXT)) {
-            value = -1;
-        } else if (arg1.equals(JsonLdCommon.CONTEXT)) {
-            value = 1;
-        } else if (arg0.equals(JsonLdCommon.TYPES)) {
-            value = 1;
-        } else if (arg1.equals(JsonLdCommon.TYPES)) {
-            value = -1;
-        } else if (arg0.equals(JsonLdCommon.ID)) {
-            value = -1;
-        } else if (arg1.equals(JsonLdCommon.ID)) {
-            value = 1;
-        } else if (arg0.equals(JsonLdCommon.TYPE)) {
-            value = -1;
-        } else if (arg1.equals(JsonLdCommon.TYPE)) {
-            value = 1;
-        } else {
-            value = String.valueOf(arg0).toLowerCase().compareTo(String.valueOf(arg1).toLowerCase());
-        }
-
-        return value;
+    	Integer leftOrder = propOrderMap.get(arg0);
+    	Integer rightOrder = propOrderMap.get(arg1);
+		if(leftOrder == null)
+			leftOrder = Math.abs(arg0.hashCode());
+    	if(rightOrder == null)
+    		rightOrder = Math.abs(arg1.hashCode());
+		
+    	return Integer.compare(leftOrder, rightOrder);
     }
 
 }

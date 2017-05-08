@@ -450,7 +450,7 @@ public class JsonLd extends JsonLdCommon {
 		List<Object> valueList = new ArrayList<Object>();
 
 		for (JsonLdPropertyValue value : jldProperty.getValues()) {
-			Map<String, Object> valueObject = new TreeMap<String, Object>();
+			Map<String, Object> valueObject = new TreeMap<String, Object>(new JsonComparator());
 			putProperty(valueObject, resource, property, value);
 
 			if (valueObject.containsKey(TYPE)) {
@@ -475,6 +475,7 @@ public class JsonLd extends JsonLdCommon {
 				addSimplifiedValue(valueList, valueObject);
 				
 			} else {
+				System.out.println(valueObject);
 				valueList.add(valueObject);
 			}
 

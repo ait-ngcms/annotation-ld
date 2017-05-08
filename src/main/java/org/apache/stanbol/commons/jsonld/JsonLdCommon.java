@@ -27,15 +27,23 @@ public abstract class JsonLdCommon {
 
     public static final String CONTEXT = "@context";
 
-    public static final String ID = "@id";
-    public static final String GRAPH = "@graph";
+    public static final String ID = "id";
+    public static final String GRAPH = "graph";
     
-    public static final String TYPE = "@type";
-    public static final String VALUE = "@value";
-    public static final String LANGUAGE = "@language";
+    public static final String TYPE = "type";
+    public static final String VALUE = "value";
+    public static final String LANGUAGE = "language";
 
-    public static final String PROFILE = "@profile";
-    public static final String TYPES = "@types";
+    public static final String PROFILE = "profile";
+    public static final String TYPES = "types";
+    
+    public static final String CREATED = "created";
+    public static final String CREATOR = "creator";
+    public static final String GENERATED = "generated";
+    public static final String GENERATOR = "generator";
+    public static final String BODY = "body";
+    public static final String TARGET = "target";
+    public static final String VIA = "via";
 
     @Deprecated
     public static final String COERCE = "@coerce";

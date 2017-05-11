@@ -54,7 +54,7 @@ public class JsonLd extends JsonLdCommon {
 	/**
 	 * Map Subject -> Resource
 	 */
-	private Map<String, JsonLdResource> resourceMap = new TreeMap<String, JsonLdResource>(new JsonComparator());
+	private Map<String, JsonLdResource> resourceMap = new TreeMap<String, JsonLdResource>(getPropOrderComparator());
 
 	/**
 	 * Flag to control whether the serialized JSON-LD output will use joint or
@@ -191,7 +191,7 @@ public class JsonLd extends JsonLdCommon {
 		if (!resourceMap.isEmpty()) {
 
 			for (String subject : resourceMap.keySet()) {
-				Map<String, Object> subjectObject = new TreeMap<String, Object>(new JsonComparator());
+				Map<String, Object> subjectObject = new TreeMap<String, Object>(getPropOrderComparator());
 				JsonLdResource resource = resourceMap.get(subject);
 
 				// put subject
@@ -215,7 +215,7 @@ public class JsonLd extends JsonLdCommon {
 
 				// put the used namespaces
 				if (!this.usedNamespaces.isEmpty() || this.useTypeCoercion) {
-					Map<String, Object> nsObject = new TreeMap<String, Object>(new JsonComparator());
+					Map<String, Object> nsObject = new TreeMap<String, Object>(getPropOrderComparator());
 
 					for (String ns : this.usedNamespaces.keySet()) {
 						nsObject.put(this.usedNamespaces.get(ns), ns);
@@ -232,17 +232,17 @@ public class JsonLd extends JsonLdCommon {
 
 	@SuppressWarnings("unchecked")
 	private Map<String, Object> createJointGraph() throws ShorteningException {
-		Map<String, Object> context = new TreeMap<String, Object>(new JsonComparator());
+		Map<String, Object> context = new TreeMap<String, Object>(getPropOrderComparator());
 
-		Map<String, Object> json = new TreeMap<String, Object>(new JsonComparator());
-		Map<String, String> coercionMap = new TreeMap<String, String>(new JsonComparator());
+		Map<String, Object> json = new TreeMap<String, Object>(getPropOrderComparator());
+		Map<String, String> coercionMap = new TreeMap<String, String>(getPropOrderComparator());
 
 		if (!resourceMap.isEmpty()) {
 			List<Object> subjects = new ArrayList<Object>();
 
 			for (String subject : resourceMap.keySet()) {
 				// put subject
-				Map<String, Object> subjectObject = new TreeMap<String, Object>(new JsonComparator());
+				Map<String, Object> subjectObject = new TreeMap<String, Object>(getPropOrderComparator());
 
 				JsonLdResource resource = resourceMap.get(subject);
 
@@ -268,7 +268,7 @@ public class JsonLd extends JsonLdCommon {
 					for (String propertyName : resource.getPropertyMap().keySet()) {
 						JsonLdProperty property = resource.getProperty(propertyName);
 						if (property.isTyped()) {
-							Map<String, Object> propObject = new TreeMap<String, Object>(new JsonComparator());
+							Map<String, Object> propObject = new TreeMap<String, Object>(getPropOrderComparator());
 							String finalPropName = propertyName;
 							if (this.useCuries) {
 								propObject.put(TYPE, this.shortenURI(property.getType()));
@@ -450,7 +450,7 @@ public class JsonLd extends JsonLdCommon {
 		List<Object> valueList = new ArrayList<Object>();
 
 		for (JsonLdPropertyValue value : jldProperty.getValues()) {
-			Map<String, Object> valueObject = new TreeMap<String, Object>(new JsonComparator());
+			Map<String, Object> valueObject = new TreeMap<String, Object>(getPropOrderComparator());
 			putProperty(valueObject, resource, property, value);
 
 			if (valueObject.containsKey(TYPE)) {
@@ -475,7 +475,6 @@ public class JsonLd extends JsonLdCommon {
 				addSimplifiedValue(valueList, valueObject);
 				
 			} else {
-				System.out.println(valueObject);
 				valueList.add(valueObject);
 			}
 
@@ -598,7 +597,9 @@ public class JsonLd extends JsonLdCommon {
 //		StringBuilder builder = new StringBuilder();
 			for (String stringValue : stringList) {
 			builder.append("\"");
-			builder.append(stringValue);
+			
+			//escape "_"_" to  "_\"_" in json
+			builder.append(stringValue.replace("\"", "\\\""));
 			builder.append("\", ");
 		}
 		//remove last ", "
@@ -619,7 +620,7 @@ public class JsonLd extends JsonLdCommon {
 	 * @throws ShorteningException
 	 */
 	private Map<String, Object> unCoerce(Object value, String type) throws ShorteningException {
-		Map<String, Object> typeDef = new TreeMap<String, Object>(new JsonComparator());
+		Map<String, Object> typeDef = new TreeMap<String, Object>(getPropOrderComparator());
 
 		if (type.equals(ID)) {
 			typeDef.put(VALUE, String.valueOf(value));

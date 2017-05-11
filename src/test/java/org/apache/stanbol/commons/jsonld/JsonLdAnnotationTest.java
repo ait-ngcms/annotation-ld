@@ -181,10 +181,28 @@ public class JsonLdAnnotationTest {
 				return false;
 			}
 		};
-       
+		
+		//fix for deserialization (Comparator)
+		ExclusionStrategy excludeComparator = new ExclusionStrategy() {
+			
+			@Override
+			public boolean shouldSkipField(FieldAttributes f) {
+				if("propOrderComparator".equals(f.getName()))
+					return true;
+				return false;
+			}
+			
+			@Override
+			public boolean shouldSkipClass(Class<?> clazz) {
+				if(Logger.class.equals(clazz))
+					return true;
+					
+				return false;
+			}
+		};
+		
+        Gson gson = new GsonBuilder().addDeserializationExclusionStrategy(excludeComparator).addSerializationExclusionStrategy(excludeLogger).create();
         
-        Gson gson = new GsonBuilder().addSerializationExclusionStrategy(excludeLogger).create(); 
-               
         String jsonLdSerializedString = gson.toJson(jsonLd, JsonLd.class);
         System.out.println("### jsonLdSerializedString ###");
         toConsole(jsonLdSerializedString);

@@ -993,7 +993,7 @@ public class JsonLdTest {
         jsonLd.put(r1);
         
         String actual = jsonLd.toString();
-        String expected = "{\"@context\":{\"age\":\"http://xmlns.com/foaf/0.1/age\",\"name\":\"http://xmlns.com/foaf/0.1/name\",\"String\":\"http://www.w3.org/2001/XMLSchema#String\",\"xsd\":\"http://www.w3.org/2001/XMLSchema#\"},\"@id\":\"_:bnode1\",\"@type\":[\"String\",\"name\"],\"age\":[{\"@type\":\"xsd:Float\",\"@value\":\"31.533567\"},{\"@language\":\"en\",\"@type\":\"xsd:String\",\"@value\":\"test\"}]}";
+        String expected = "{\"@context\":{\"age\":\"http://xmlns.com/foaf/0.1/age\",\"name\":\"http://xmlns.com/foaf/0.1/name\",\"String\":\"http://www.w3.org/2001/XMLSchema#String\",\"xsd\":\"http://www.w3.org/2001/XMLSchema#\"},\"@id\":\"_:bnode1\",\"@type\":[\"String\",\"name\"],\"age\":[{\"@type\":\"xsd:Float\",\"@value\":\"31.533567\"},{\"@type\":\"xsd:String\",\"@language\":\"en\",\"@value\":\"test\"}]}";
         assertEquals(expected, actual); 
     }
     
@@ -1026,7 +1026,7 @@ public class JsonLdTest {
         jsonLd.put(r1);
         
         String actual = jsonLd.toString();
-        String expected = "{\"@context\":{\"age\":\"http://xmlns.com/foaf/0.1/age\",\"name\":\"http://xmlns.com/foaf/0.1/name\",\"String\":\"http://www.w3.org/2001/XMLSchema#String\",\"xsd\":\"http://www.w3.org/2001/XMLSchema#\"},\"@id\":\"_:bnode1\",\"@type\":[\"String\",\"name\"],\"age\":[{\"@type\":\"xsd:Float\",\"@value\":\"31.533567\"},{\"@language\":\"en\",\"@type\":\"xsd:String\",\"@value\":\"test\"},\"One more untyped value\"]}";
+        String expected = "{\"@context\":{\"age\":\"http://xmlns.com/foaf/0.1/age\",\"name\":\"http://xmlns.com/foaf/0.1/name\",\"String\":\"http://www.w3.org/2001/XMLSchema#String\",\"xsd\":\"http://www.w3.org/2001/XMLSchema#\"},\"@id\":\"_:bnode1\",\"@type\":[\"String\",\"name\"],\"age\":[{\"@type\":\"xsd:Float\",\"@value\":\"31.533567\"},{\"@type\":\"xsd:String\",\"@language\":\"en\",\"@value\":\"test\"},\"One more untyped value\"]}";
         assertEquals(expected, actual); 
     }
 

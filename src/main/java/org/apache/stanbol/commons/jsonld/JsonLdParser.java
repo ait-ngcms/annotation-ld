@@ -547,17 +547,17 @@ public class JsonLdParser extends JsonLdParserCommon {
 			JSONObject jo = (JSONObject) input;
 
 			// Handle IRIs
-			if (jo.has(JsonLdCommon.ID)) {
-				try {
-					return new JsonLdIRI(unCURIE(
-							jo.getString(JsonLdCommon.ID), namespacePrefixMap));
-				} catch (JSONException e) {
-					return null;
-				}
-			} else {
-				// Handle arbitrary JSON
-				return convertToMap(jo, namespacePrefixMap);
-			}
+			JsonLdIRI iri = handleIri(JsonLdCommon.ID, jo, namespacePrefixMap);
+			if(iri != null)
+				return iri;
+			
+//			iri = handleIri(JsonLdCommon._ID, jo, namespacePrefixMap);
+//			if(iri != null)
+//				return iri;
+			
+			// Handle arbitrary JSON
+			return convertToMap(jo, namespacePrefixMap);
+			
 		} else if (input instanceof JSONArray) {
 			JSONArray ao = (JSONArray) input;
 			return convertToList(ao, namespacePrefixMap);
@@ -566,6 +566,18 @@ public class JsonLdParser extends JsonLdParserCommon {
 		} else {
 			return input;
 		}
+	}
+
+	protected static JsonLdIRI handleIri(String idKey, JSONObject jo, Map<String, String> namespacePrefixMap) {
+		if (jo.has(idKey)) {
+			try {
+				return new JsonLdIRI(unCURIE(
+						jo.getString(idKey), namespacePrefixMap));
+			} catch (JSONException e) {
+				return null;
+			}
+		}
+		return null;
 	}
 
 	/**

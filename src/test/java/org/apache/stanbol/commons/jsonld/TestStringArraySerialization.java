@@ -7,8 +7,8 @@ import org.junit.Test;
 public class TestStringArraySerialization {
 
 	String fieldName = "testprop";
-	String val1 = "val1";
-	String val2 = "val2";
+	String val1 = "val1\"";
+	String val2 = "val2\"";
 	
 	@Test
 	public void testStringArraySize1Minimized() {
@@ -16,7 +16,7 @@ public class TestStringArraySerialization {
 		JsonLd jsonLd = createJsonLdObj(fieldName, array, true);
 		
 		String actual = jsonLd.toString();
-		String expected = "{\"testprop\":\"val1\"}";
+		String expected = "{\"testprop\":\"val1\\\"\"}";
 		
 		assertEquals(actual, expected);
 	}
@@ -27,7 +27,7 @@ public class TestStringArraySerialization {
 		JsonLd jsonLd = createJsonLdObj(fieldName, array, false);
 		
 		String actual = jsonLd.toString();
-		String expected = "{\"testprop\":[\"val1\"]}";
+		String expected = "{\"testprop\":[\"val1\\\"\"]}";
 		
 		assertEquals(actual, expected);
 	}
@@ -39,7 +39,7 @@ public class TestStringArraySerialization {
 		JsonLd jsonLd = createJsonLdObj(fieldName, array, false);
 		
 		String actual = jsonLd.toString();
-		String expected = "{\"testprop\":[\"val1\", \"val2\"]}";
+		String expected = "{\"testprop\":[\"val1\\\"\", \"val2\\\"\"]}";
 		
 		assertEquals(actual, expected);
 	}

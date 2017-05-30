@@ -20,11 +20,13 @@ import java.util.Comparator;
 import java.util.HashMap;
 
 /**
+ * This class is specific to annotations must be moved to (europeana) annotation repository
  * A comparator for JSON-LD maps to ensure the order of certain key elements
  * like '#', '@', 'a' in JSON-LD output.
  *
- * @author Fabian Christ
+ * @author Jan Roerden
  */
+@Deprecated
 public class AnnotationsJsonComparator implements Comparator<Object> {
 	
 	static final HashMap<String, Integer> propOrderMap = new HashMap<String, Integer>();

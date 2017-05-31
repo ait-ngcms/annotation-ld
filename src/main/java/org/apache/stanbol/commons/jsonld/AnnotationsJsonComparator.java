@@ -28,21 +28,30 @@ import java.util.HashMap;
  */
 @Deprecated
 public class AnnotationsJsonComparator implements Comparator<Object> {
+    
+    public static final String CREATED = "created";
+    public static final String CREATOR = "creator";
+    public static final String GENERATED = "generated";
+    public static final String GENERATOR = "generator";
+    public static final String BODY = "body";
+    public static final String TARGET = "target";
+    public static final String VIA = "via";
+	public static final String MOTIVATION = "motivation";
 	
 	static final HashMap<String, Integer> propOrderMap = new HashMap<String, Integer>();
 	static {
 		propOrderMap.put(JsonLdCommon.CONTEXT, 10);
 		propOrderMap.put(JsonLdCommon._ID, 20);
 		propOrderMap.put(JsonLdCommon._TYPE, 30);
-		propOrderMap.put(JsonLdCommon.MOTIVATION, 40);
-		propOrderMap.put(JsonLdCommon.CREATED, 50);
-		propOrderMap.put(JsonLdCommon.CREATOR, 60);
-		propOrderMap.put(JsonLdCommon.GENERATED, 70);
-		propOrderMap.put(JsonLdCommon.GENERATOR, 80);
-		propOrderMap.put(JsonLdCommon.BODY, 90);
+		propOrderMap.put(MOTIVATION, 40);
+		propOrderMap.put(CREATED, 50);
+		propOrderMap.put(CREATOR, 60);
+		propOrderMap.put(GENERATED, 70);
+		propOrderMap.put(GENERATOR, 80);
+		propOrderMap.put(BODY, 90);
 		propOrderMap.put(JsonLdCommon._VALUE, 100);
-		propOrderMap.put(JsonLdCommon.TARGET, 110);
-		propOrderMap.put(JsonLdCommon.VIA, 120);
+		propOrderMap.put(TARGET, 110);
+		propOrderMap.put(VIA, 120);
 	}
 
     @Override

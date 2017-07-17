@@ -939,7 +939,9 @@ public class JsonLd extends JsonLdCommon {
 
 		String key;
 		// remove the key prefix e.g. "prefLabel" + "."
-		int prefixLength = solrFieldPrefix.length() + 1;
+		int prefixLength = 0;
+		if(solrFieldPrefix != null && solrFieldPrefix.length() > 0)
+			prefixLength = solrFieldPrefix.length() + 1;
 
 		JsonLdProperty mapProperty = new JsonLdProperty(propertyName);
 		JsonLdPropertyValue mapPropertyValue = new JsonLdPropertyValue();

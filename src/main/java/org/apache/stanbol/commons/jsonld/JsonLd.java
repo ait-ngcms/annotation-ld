@@ -809,8 +809,10 @@ public class JsonLd extends JsonLdCommon {
 			return null;
 
 		String key;
-		//remove the key prefix e.g. "prefLabel" + "."   
-		int prefixLength = solrFieldPrefix.length() +1 ;
+		// remove the key prefix e.g. "prefLabel" + "."
+		int prefixLength = 0;
+		if(solrFieldPrefix != null && solrFieldPrefix.length() > 0)
+			prefixLength = solrFieldPrefix.length() + 1;
 		
 		JsonLdProperty mapProperty = new JsonLdProperty(propertyName);
 		JsonLdPropertyValue mapPropertyValue = new JsonLdPropertyValue();
@@ -818,7 +820,7 @@ public class JsonLd extends JsonLdCommon {
 
 		for (Map.Entry<String, List<String>> entry : values.entrySet()) {
 			key = entry.getKey();
-			if(solrFieldPrefix != null) {
+			if(prefixLength > 0) {
 				key = key.substring(prefixLength);
 			}
 			

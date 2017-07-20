@@ -824,7 +824,7 @@ public class JsonLd extends JsonLdCommon {
 				key = key.substring(prefixLength);
 			}
 			
-			entryProperty = buildListProperty(key, entry.getValue(), true);
+			entryProperty = buildListProperty(key, entry.getValue(), false);
 					
 			mapPropertyValue.putProperty(entryProperty);			
 		}

@@ -951,7 +951,7 @@ public class JsonLd extends JsonLdCommon {
 
 		for (Map.Entry<String, String> entry : values.entrySet()) {
 			key = entry.getKey();
-			if (solrFieldPrefix != null) {
+			if (prefixLength > 0) {
 				key = key.substring(prefixLength);
 			}
 
@@ -981,7 +981,10 @@ public class JsonLd extends JsonLdCommon {
 
 		String language;
 		// remove the key prefix e.g. "prefLabel" + "."
-		int prefixLength = solrFieldPrefix.length() + 1;
+		int prefixLength = 0;
+		if(solrFieldPrefix != null && solrFieldPrefix.length() > 0)
+			prefixLength = solrFieldPrefix.length() + 1;
+
 
 		JsonLdProperty mainProperty = new JsonLdProperty(propertyName);
 		// we don't know how many entries in advance
@@ -994,7 +997,7 @@ public class JsonLd extends JsonLdCommon {
 		// build values and ad to references list
 		for (Map.Entry<String, List<String>> entry : values.entrySet()) {
 			language = entry.getKey();
-			if (solrFieldPrefix != null) {
+			if (prefixLength > 0) {
 				language = language.substring(prefixLength);
 			}
 

@@ -77,6 +77,10 @@ public final class JsonSerializer {
     private static void appendJsonMap(Map<String,Object> jsonMap, StringBuffer sb, int indent, int level) {
         sb.append('{');
         level = increaseIndentationLevel(sb, indent, level);
+        //never minimize maps
+        //TODO: check if there are cases where the maps should be minimized at serialization time (i.e. not at JsonLd resource building) 
+        boolean isContainerProp = true;
+		
         for (String key : jsonMap.keySet()) {
             appendIndentation(sb, indent, level);
             appendQuoted(key, sb);
@@ -121,6 +125,19 @@ public final class JsonSerializer {
                 sb.append(',');
                 appendLinefeed(sb, indent);
             }
+        } else if (object instanceof String[]) {
+        	//keep consistent with List
+        	String[] array = (String[]) object;
+        	if (array.length == 1 && !isContainer) {
+                // if the list contains only 1 element, we can serialize it as a single value
+                appendValueOf(array[0], sb, indent, level, isContainer);
+            }
+            else {
+                // the list has more or no elements
+                appendStringArray(array, sb, indent, level);
+                sb.append(',');
+                appendLinefeed(sb, indent);
+            }
         } else if (object instanceof JSONArray) {
             JSONArray ja = (JSONArray) object;
             List<Object> jsonList = new ArrayList<Object>();
@@ -132,6 +149,7 @@ public final class JsonSerializer {
                 // ignore
             }
             appendValueOf(jsonList, sb, indent, level, isContainer);
+        
         } else {
             sb.append(object.toString());
             sb.append(',');
@@ -152,7 +170,20 @@ public final class JsonSerializer {
         appendIndentation(sb, indent, level);
         sb.append(']');
     }
-
+    
+    private static void appendStringArray(String[] jsonArray, StringBuffer sb, int indent, int level) {
+        sb.append('[');
+        level = increaseIndentationLevel(sb, indent, level);
+        for (String object : jsonArray) {
+            appendIndentation(sb, indent, level);
+            //array serialization doesn't use the isContainerProp() construct. They are individually set to minimized/verbose serialization
+            appendValueOf(object, sb, indent, level, false);
+        }
+        removeOddChars(sb, indent);
+        level = decreaseIndentationLevel(sb, indent, level);
+        appendIndentation(sb, indent, level);
+        sb.append(']');
+    }
     private static void appendQuoted(String string, StringBuffer sb) {
         sb.append('"');
         for (int i = 0; i < string.length(); i++) {

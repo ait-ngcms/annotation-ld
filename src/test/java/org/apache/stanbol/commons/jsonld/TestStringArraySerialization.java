@@ -29,7 +29,7 @@ public class TestStringArraySerialization {
 		String actual = jsonLd.toString();
 		String expected = "{\"testprop\":[\"val1\\\"\"]}";
 		
-		assertEquals(actual, expected);
+		assertEquals(expected, actual);
 	}
 	
 	
@@ -39,9 +39,9 @@ public class TestStringArraySerialization {
 		JsonLd jsonLd = createJsonLdObj(fieldName, array, false);
 		
 		String actual = jsonLd.toString();
-		String expected = "{\"testprop\":[\"val1\\\"\", \"val2\\\"\"]}";
+		String expected = "{\"testprop\":[\"val1\\\"\",\"val2\\\"\"]}";
 		
-		assertEquals(actual, expected);
+		assertEquals(expected, actual);
 	}
 	
 	private JsonLd createJsonLdObj(String fieldName, String[] array, boolean minimized) {

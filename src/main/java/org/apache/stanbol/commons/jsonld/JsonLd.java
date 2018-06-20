@@ -372,7 +372,7 @@ public class JsonLd extends JsonLdCommon {
 	}
 	
 	/**
-	 * TODO: move to JSONLD
+	 * 
 	 * @param propName
 	 * @param mapOfString
 	 * @param mapKeyPrefix
@@ -474,11 +474,7 @@ public class JsonLd extends JsonLdCommon {
 
 		}
 
-		//StringBuilder is the serialized representation of String[]. Avoid double encoding into arrays 
-		if(valueList.size() == 1 && valueList.get(0) instanceof StringBuilder)
-			jsonObject.put(shortenURI(property), valueList.get(0));
-		else
-			jsonObject.put(shortenURI(property), valueList);
+		jsonObject.put(shortenURI(property), valueList);
 	}
 
 	private void simplifyIRI(Map<String, Object> valueObject) throws ShorteningException {
@@ -496,7 +492,11 @@ public class JsonLd extends JsonLdCommon {
 		if (convertedValue instanceof String) {
 			String strValue = (String) convertedValue;
 			valueList.add(shortenURI(strValue));
-		} else {
+		}else if(convertedValue instanceof String[]){ 
+			String[] values = (String[]) convertedValue;
+			for(String value: values)
+				valueList.add(value);
+		}else {
 			valueList.add(convertedValue);
 		}
 	}

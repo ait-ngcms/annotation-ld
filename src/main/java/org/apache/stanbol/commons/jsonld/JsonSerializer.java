@@ -90,7 +90,7 @@ public final class JsonSerializer {
                 sb.append(": ");
             }
             
-            appendValueOf(jsonMap.get(key), sb, indent, level, isContainerProp(key));
+            appendValueOf(jsonMap.get(key), sb, indent, level, isContainerProp);
         }
         removeOddChars(sb, indent);
         level = decreaseIndentationLevel(sb, indent, level);

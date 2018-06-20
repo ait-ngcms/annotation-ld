@@ -356,7 +356,7 @@ public class JsonLd extends JsonLdCommon {
 		// This is a single value property but it may have
 		// a datatype and a language.
 		Object value = jldProperty.getValues().get(0);
-		Map<String, Object> valueObject = new TreeMap<String, Object>();
+		Map<String, Object> valueObject = new TreeMap<String, Object>(getPropOrderComparator());
 		putProperty(valueObject, resource, property, value);
 
 		if (valueObject.containsKey(TYPE)) {

@@ -551,7 +551,7 @@ public class JsonLd extends JsonLdCommon {
 					if (pairs.getKey() != null) {
 						JsonLdProperty jldProperty = pairs.getValue();
 
-						if (!isContainerProperty(property) && jldProperty.isSingleValued()) {
+						if (!isContainerProperty(jldProperty.getName()) && jldProperty.isSingleValued()) {
 							putSingleValuedProperty(jsonObject, resource, jldProperty.getName(), jldProperty);
 						} else {
 							putMultiValuedProperty(jsonObject, resource, jldProperty.getName(), jldProperty);

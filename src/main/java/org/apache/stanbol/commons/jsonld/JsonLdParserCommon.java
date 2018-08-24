@@ -16,13 +16,14 @@
 */
 package org.apache.stanbol.commons.jsonld;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 public abstract class JsonLdParserCommon {
 
-	private static final Logger logger = Logger.getLogger(JsonLdParserCommon.class);
+	private static final Logger logger = LogManager.getLogger(JsonLdParserCommon.class);
     
     /**
      * Uses the underlying Jettison to parse a JSON object.

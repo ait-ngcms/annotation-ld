@@ -16,13 +16,14 @@
 */
 package org.apache.stanbol.commons.jsonld;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 public class JsonLdProfileParser extends JsonLdParserCommon {
 
-	private static final Logger logger = Logger.getLogger(JsonLdProfileParser.class);
+	private static final Logger logger = LogManager.getLogger(JsonLdProfileParser.class);
 
     public static JsonLdProfile parseProfile(String jsonLdProfileString) throws Exception {
         logger.debug("Parsing {} " + jsonLdProfileString);

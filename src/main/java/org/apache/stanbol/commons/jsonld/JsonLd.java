@@ -26,7 +26,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.codehaus.jettison.json.JSONObject;
 
 /**
@@ -1019,7 +1020,7 @@ public class JsonLd extends JsonLdCommon {
 
 	protected Logger getLogger() {
 		if(logger == null)
-			logger = Logger.getLogger(JsonLd.class);
+			logger = LogManager.getLogger(JsonLd.class);
 		return logger ;
 	}
 	

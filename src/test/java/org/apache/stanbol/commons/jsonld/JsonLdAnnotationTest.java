@@ -21,7 +21,7 @@ import static org.junit.Assert.assertNotNull;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -176,7 +176,7 @@ public class JsonLdAnnotationTest {
 			
 			@Override
 			public boolean shouldSkipClass(Class<?> clazz) {
-				if(Logger.class.equals(clazz))
+				if(LogManager.class.equals(clazz))
 					return true;
 					
 				return false;
@@ -195,7 +195,7 @@ public class JsonLdAnnotationTest {
 			
 			@Override
 			public boolean shouldSkipClass(Class<?> clazz) {
-				if(Logger.class.equals(clazz))
+				if(LogManager.class.equals(clazz))
 					return true;
 					
 				return false;

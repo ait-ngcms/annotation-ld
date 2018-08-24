@@ -23,7 +23,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -36,7 +37,7 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class JsonLdParser extends JsonLdParserCommon {
 
-	private static final Logger logger = Logger.getLogger(JsonLdParser.class);
+	private static final Logger logger = LogManager.getLogger(JsonLdParser.class);
 
 	/**
 	 * Parse the given String into a JSON-LD data structure.

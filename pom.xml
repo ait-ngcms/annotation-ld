@@ -32,9 +32,9 @@
 
 		<!-- Logging -->
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>${version.log4j}</version>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${version.log4j2}</version>
 		</dependency>
 
 		<dependency>
@@ -57,7 +57,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<version.java>1.7</version.java>
-		<version.log4j>1.2.12</version.log4j>		
+		<version.log4j2>2.9.1</version.log4j2>		
 	</properties>
 	
 	<build>

@@ -56,15 +56,17 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<version.java>1.7</version.java>
+		<version.java>1.8</version.java>
 		<version.log4j2>2.9.1</version.log4j2>		
 	</properties>
 	
 	<build>
+		
+		<finalName>${project.artifactId}-${project.version}</finalName>
+		
 		<!-- configure source and output locations -->
 		<directory>target</directory>
 		<outputDirectory>target/classes</outputDirectory>
-		<finalName>${project.artifactId}-${project.version}</finalName>
 		<testOutputDirectory>target/test-classes</testOutputDirectory>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>

@@ -464,7 +464,7 @@ public class JsonLd extends JsonLdCommon {
 					simplifyIRI(valueObject);
 					valueList.add(valueObject);
 				}
-			} else if (valueObject.size() == 1 && valueObject.containsKey(VALUE)) {
+			} else if (valueObject.size() == 1 && valueObject.containsKey(VALUE) && !isContainerProperty(property)) {
 				// If the returned value object contains only one @value value,
 				// we can simplify the value by admitting the @value.
 				addSimplifiedValue(valueList, valueObject);
@@ -920,7 +920,7 @@ public class JsonLd extends JsonLdCommon {
 	protected JsonLdProperty buildMapOfEntityReferenceProperty(String propertyName, Map<String, List<String>> values,
 			String solrFieldPrefix) {
 
-		if (values == null)
+		if (values == null || values.isEmpty())
 			return null;
 
 		String language;
@@ -931,8 +931,7 @@ public class JsonLd extends JsonLdCommon {
 
 
 		JsonLdProperty mainProperty = new JsonLdProperty(propertyName);
-		// we don't know how many entries in advance
-		List<JsonLdPropertyValue> references = new ArrayList<JsonLdPropertyValue>();
+//		List<JsonLdPropertyValue> references = new ArrayList<JsonLdPropertyValue>();
 
 		JsonLdPropertyValue referenceValue;
 		JsonLdProperty referenceProperty;
@@ -951,27 +950,28 @@ public class JsonLd extends JsonLdCommon {
 					referenceProperty = new JsonLdProperty("@id", listEntry);
 					referenceValue = new JsonLdPropertyValue();
 					referenceValue.putProperty(referenceProperty);
-					references.add(referenceValue);
+//					references.add(referenceValue);
+					mainProperty.addValue(referenceValue);
 				} else {
 					JsonLdProperty langProp = new JsonLdProperty("@language", language);
 					JsonLdProperty valueProp = new JsonLdProperty("@value", listEntry);
 					multilingualValue = new JsonLdPropertyValue();
 					multilingualValue.putProperty(langProp);
 					multilingualValue.putProperty(valueProp);
-					references.add(multilingualValue);
-					// mapPropertyValue.putProperty(multilingualProperty);
+//					references.add(multilingualValue);
+					mainProperty.addValue(multilingualValue);
 				}
 			}
 		}
 
 		// serialize references list
-		if (references.size() == 1) {
-			mainProperty.addValue(references.get(0));
-		} else {
-			for (JsonLdPropertyValue jsonLdProperty : references) {
-				mainProperty.addValue(jsonLdProperty);
-			}
-		}
+//		if (references.size() == 1) {
+//			mainProperty.addValue(references.get(0));
+//		} else {
+//			for (JsonLdPropertyValue jsonLdProperty : references) {
+//				mainProperty.addValue(jsonLdProperty);
+//			}
+//		}
 
 		return mainProperty;
 	}

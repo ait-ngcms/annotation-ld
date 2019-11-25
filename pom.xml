@@ -16,7 +16,7 @@
 
 	<groupId>at.ac.ait.ngcms</groupId>
 	<artifactId>annotation-ld</artifactId>
-	<version>1.1.4-RELEASE</version>
+	<version>1.1.5</version>
 	<name>annotation-ld</name>
 	<description>The Stanbol JSON-LD API to create JSON-LD structures with extensions for Open Annotation-LD.
   Parse them from String representation and to serialize them to Strings.
@@ -56,15 +56,17 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<version.java>1.7</version.java>
+		<version.java>1.8</version.java>
 		<version.log4j2>2.9.1</version.log4j2>		
 	</properties>
 	
 	<build>
+		
+		<finalName>${project.artifactId}-${project.version}</finalName>
+		
 		<!-- configure source and output locations -->
 		<directory>target</directory>
 		<outputDirectory>target/classes</outputDirectory>
-		<finalName>${artifactId}-${version}</finalName>
 		<testOutputDirectory>target/test-classes</testOutputDirectory>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
@@ -82,16 +84,6 @@
 				<directory>src/test/resources</directory>
 			</testResource>
 		</testResources>
-
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-			</plugin>
-		</plugins>
+	
 	</build>
 </project>

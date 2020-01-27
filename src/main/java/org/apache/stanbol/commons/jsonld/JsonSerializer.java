@@ -76,34 +76,33 @@ public final class JsonSerializer {
 	}
 
 	private static void appendJsonMap(Map<String, Object> jsonMap, StringBuffer sb, int indent, int level) {
-		sb.append('{');
-		level = increaseIndentationLevel(sb, indent, level);
-
-		for (String key : jsonMap.keySet()) {
+		// for the use case that value is already a jsonld string
+		if (jsonMap.containsKey("value") && ((String) jsonMap.get("value")).contains("\"")) {
+			String contentStr = (String) jsonMap.get("value");
+			sb.append(contentStr);
+			sb.append(',');
+		} else {
+			sb.append('{');
+			level = increaseIndentationLevel(sb, indent, level);
+	
+			for (String key : jsonMap.keySet()) {
+				appendIndentation(sb, indent, level);
+				appendQuoted(key, sb);
+				if (indent == 0) {
+					sb.append(':');
+				} else {
+					sb.append(": ");
+				}
+	
+				boolean isContainerProp = isContainerProp(key);
+	
+				appendValueOf(jsonMap.get(key), sb, indent, level, isContainerProp);
+			}
+			removeOddChars(sb, indent);
+			level = decreaseIndentationLevel(sb, indent, level);
 			appendIndentation(sb, indent, level);
-			appendQuoted(key, sb);
-			if (indent == 0) {
-				sb.append(':');
-			} else {
-				sb.append(": ");
-			}
-
-			boolean isContainerProp = isContainerProp(key);
-
-			Object content = jsonMap.get(key);
-			if (key.equals("body")) {
-				String contentStr = (String) ((Map<String,String>) content).get("value");
-				sb.append(contentStr);
-				sb.append(',');
-				appendLinefeed(sb, indent);
-			} else {
-				appendValueOf(content, sb, indent, level, isContainerProp);
-			}
+			sb.append('}').append(',');
 		}
-		removeOddChars(sb, indent);
-		level = decreaseIndentationLevel(sb, indent, level);
-		appendIndentation(sb, indent, level);
-		sb.append('}').append(',');
 		appendLinefeed(sb, indent);
 	}
 

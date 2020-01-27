@@ -90,7 +90,15 @@ public final class JsonSerializer {
 
 			boolean isContainerProp = isContainerProp(key);
 
-			appendValueOf(jsonMap.get(key), sb, indent, level, isContainerProp);
+			Object content = jsonMap.get(key);
+			if (key.equals("body")) {
+				String contentStr = (String) ((Map<String,String>) content).get("value");
+				sb.append(contentStr);
+				sb.append(',');
+				appendLinefeed(sb, indent);
+			} else {
+				appendValueOf(content, sb, indent, level, isContainerProp);
+			}
 		}
 		removeOddChars(sb, indent);
 		level = decreaseIndentationLevel(sb, indent, level);

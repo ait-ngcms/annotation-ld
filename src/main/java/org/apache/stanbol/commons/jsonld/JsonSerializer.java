@@ -77,9 +77,10 @@ public final class JsonSerializer {
 
 	private static void appendJsonMap(Map<String, Object> jsonMap, StringBuffer sb, int indent, int level) {
 		// for the use case that value is already a jsonld string
-		if (jsonMap.containsKey("value") && ((String) jsonMap.get("value")).contains("\"")) {
-			String contentStr = (String) jsonMap.get("value");
-			sb.append(contentStr);
+	    	// hack for dereferenciation
+	    	String preSerializedMap = getPreSerializedValue(jsonMap);
+	    	if (preSerializedMap != null) {
+			sb.append(preSerializedMap);
 			sb.append(',');
 		} else {
 			sb.append('{');
@@ -104,6 +105,20 @@ public final class JsonSerializer {
 			sb.append('}').append(',');
 		}
 		appendLinefeed(sb, indent);
+	}
+
+	private static String getPreSerializedValue(Map<String, Object> jsonMap) {
+	    String valuePropName = "value";
+	    if(!jsonMap.containsKey(valuePropName)) {
+		return null;
+	    }
+	    //check if {XXX}
+	    String trimedValue = jsonMap.get(valuePropName).toString().trim();
+	    if(trimedValue.startsWith("{") && trimedValue.endsWith("}")){
+		return trimedValue;
+	    }
+	    
+	    return null;
 	}
 
 	@SuppressWarnings("unchecked")

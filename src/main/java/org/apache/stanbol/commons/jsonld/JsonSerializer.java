@@ -76,27 +76,49 @@ public final class JsonSerializer {
 	}
 
 	private static void appendJsonMap(Map<String, Object> jsonMap, StringBuffer sb, int indent, int level) {
-		sb.append('{');
-		level = increaseIndentationLevel(sb, indent, level);
-
-		for (String key : jsonMap.keySet()) {
-			appendIndentation(sb, indent, level);
-			appendQuoted(key, sb);
-			if (indent == 0) {
-				sb.append(':');
-			} else {
-				sb.append(": ");
+		// for the use case that value is already a jsonld string
+	    	// hack for dereferenciation
+	    	String preSerializedMap = getPreSerializedValue(jsonMap);
+	    	if (preSerializedMap != null) {
+			sb.append(preSerializedMap);
+			sb.append(',');
+		} else {
+			sb.append('{');
+			level = increaseIndentationLevel(sb, indent, level);
+	
+			for (String key : jsonMap.keySet()) {
+				appendIndentation(sb, indent, level);
+				appendQuoted(key, sb);
+				if (indent == 0) {
+					sb.append(':');
+				} else {
+					sb.append(": ");
+				}
+	
+				boolean isContainerProp = isContainerProp(key);
+	
+				appendValueOf(jsonMap.get(key), sb, indent, level, isContainerProp);
 			}
-
-			boolean isContainerProp = isContainerProp(key);
-
-			appendValueOf(jsonMap.get(key), sb, indent, level, isContainerProp);
+			removeOddChars(sb, indent);
+			level = decreaseIndentationLevel(sb, indent, level);
+			appendIndentation(sb, indent, level);
+			sb.append('}').append(',');
 		}
-		removeOddChars(sb, indent);
-		level = decreaseIndentationLevel(sb, indent, level);
-		appendIndentation(sb, indent, level);
-		sb.append('}').append(',');
 		appendLinefeed(sb, indent);
+	}
+
+	private static String getPreSerializedValue(Map<String, Object> jsonMap) {
+	    String valuePropName = "value";
+	    if(!jsonMap.containsKey(valuePropName)) {
+		return null;
+	    }
+	    //check if {XXX}
+	    String trimedValue = jsonMap.get(valuePropName).toString().trim();
+	    if(trimedValue.startsWith("{") && trimedValue.endsWith("}")){
+		return trimedValue;
+	    }
+	    
+	    return null;
 	}
 
 	@SuppressWarnings("unchecked")

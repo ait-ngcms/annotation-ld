@@ -328,8 +328,7 @@ public class JsonLd extends JsonLdCommon {
 				subjectObject.put(TYPE, types.get(0));
 			} else {
 				Collections.sort(types, new Comparator<String>() {
-
-					@Override
+//					@Override
 					public int compare(String arg0, String arg1) {
 						return arg0.compareTo(arg1);
 					}

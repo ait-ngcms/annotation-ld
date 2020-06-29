@@ -167,14 +167,14 @@ public class JsonLdAnnotationTest {
         //quickFix for the test
         ExclusionStrategy excludeLogger = new ExclusionStrategy() {
 			
-			@Override
+//			@Override
 			public boolean shouldSkipField(FieldAttributes f) {
 				if("logger".equals(f.getName()))
 					return true;
 				return false;
 			}
 			
-			@Override
+//			@Override
 			public boolean shouldSkipClass(Class<?> clazz) {
 				if(LogManager.class.equals(clazz))
 					return true;
@@ -186,14 +186,14 @@ public class JsonLdAnnotationTest {
 		//fix for deserialization (Comparator)
 		ExclusionStrategy excludeComparator = new ExclusionStrategy() {
 			
-			@Override
+//			@Override
 			public boolean shouldSkipField(FieldAttributes f) {
 				if("propOrderComparator".equals(f.getName()))
 					return true;
 				return false;
 			}
 			
-			@Override
+//			@Override
 			public boolean shouldSkipClass(Class<?> clazz) {
 				if(LogManager.class.equals(clazz))
 					return true;

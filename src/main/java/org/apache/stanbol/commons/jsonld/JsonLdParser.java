@@ -182,7 +182,6 @@ public class JsonLdParser extends JsonLdParserCommon {
 	 * @param jld
 	 *            JsonLd object to add the created subject resource.
 	 */
-	@SuppressWarnings("deprecation")
 	@Deprecated  
 	private static void parseSubjectExt(JSONObject jo, JsonLd jld, int bnodeCount,
 			String profile) {

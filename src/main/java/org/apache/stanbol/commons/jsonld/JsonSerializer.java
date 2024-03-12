@@ -174,7 +174,12 @@ public final class JsonSerializer {
 	}
 
 	private static void appendList(List<Object> jsonArray, StringBuffer sb, int indent, int level) {
-		sb.append('[');
+	    sb.append('[');
+	    if(jsonArray.isEmpty()) {
+		  sb.append(']');
+		  return;
+		}
+
 		level = increaseIndentationLevel(sb, indent, level);
 		for (Object object : jsonArray) {
 			appendIndentation(sb, indent, level);
